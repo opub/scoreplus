@@ -1,0 +1,8 @@
+salt: "imW$OcsNQwy7XtVld@p&Nr#0mkN&qN33$M5*4ZNzmYe%95e&qUdE0f7!Lr0mPMoI"
+
+db:
+  name: scoreplus_test
+  host: localhost
+  port: 5432
+  username: scoreplus_user
+  password: "8BcD2T3W6xpPjlXA9D#loRfQTz%p^zhT"
