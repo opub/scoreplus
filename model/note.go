@@ -2,10 +2,10 @@ package model
 
 import "time"
 
-//Sport data model
-type Sport struct {
+//Note data model
+type Note struct {
 	ID         int
-	Name       string
+	Message    string
 	Created     time.Time `sql:" NOT NULL DEFAULT now()"`
 	CreatedBy   int `sql:" NOT NULL"`
 	Modified   time.Time

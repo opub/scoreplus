@@ -4,14 +4,19 @@ import "time"
 
 //Member data model
 type Member struct {
-	ID        string
-	Handle    string `sql:",unique"`
-	Email     string `sql:",unique"`
-	FirstName string
-	LastName  string
-	Teams     []*Team
-	Follows   []*Member
-	Followers []*Member
-	Created   time.Time `sql:"default:now()"`
-	Modified  time.Time
+	ID         int
+	Handle     string
+	Email      string
+	FirstName  string
+	LastName   string
+	Verified   bool
+	Enabled    bool
+	LastActive time.Time
+	Teams      []int
+	Follows    []int
+	Followers  []int
+	Created    time.Time `sql:" NOT NULL DEFAULT now()"`
+	CreatedBy  int       `sql:" NOT NULL"`
+	Modified   time.Time
+	ModifiedBy int
 }

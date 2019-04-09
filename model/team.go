@@ -4,12 +4,14 @@ import "time"
 
 //Team data model
 type Team struct {
-	ID       string
-	Name     string `sql:",unique"`
-	Sport    Sport
-	Location string
-	Mascot   string
-	Games    []*Game
-	Created  time.Time `sql:"default:now()"`
-	Modified time.Time
+	ID         int
+	Name       string
+	Sport      Sport
+	Venue      Venue
+	Mascot     string
+	Games      []int
+	Created     time.Time `sql:" NOT NULL DEFAULT now()"`
+	CreatedBy   int `sql:" NOT NULL"`
+	Modified   time.Time
+	ModifiedBy int
 }

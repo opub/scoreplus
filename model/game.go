@@ -4,16 +4,19 @@ import "time"
 
 //Game data model
 type Game struct {
-	ID        string
-	Sport     Sport
-	HomeTeam  Team
-	AwayTeam  Team
-	HomeScore int
-	AwayScore int
-	Final     bool
-	Location  string
-	Date      time.Time
-	Notes     []string
-	Created   time.Time `sql:"default:now()"`
-	Modified  time.Time
+	ID         int
+	Sport      Sport
+	HomeTeam   Team
+	AwayTeam   Team
+	HomeScore  int
+	AwayScore  int
+	Start      time.Time
+	Final      bool
+	Venue      Venue
+	Date       time.Time
+	Notes      []int
+	Created    time.Time `sql:" NOT NULL DEFAULT now()"`
+	CreatedBy  int       `sql:" NOT NULL"`
+	Modified   time.Time
+	ModifiedBy int
 }
