@@ -3,7 +3,11 @@
 DROP TABLE IF EXISTS game CASCADE;
 CREATE TABLE game
 (
-	id serial NOT NULL PRIMARY KEY,
+	id serial PRIMARY KEY,
+	created timestamp with time zone NOT NULL DEFAULT now(),
+	createdby integer NOT NULL,
+	modified timestamp with time zone,
+	modifiedby integer,
 	sport integer,
 	hometeam integer,
 	awayteam integer,
@@ -13,23 +17,25 @@ CREATE TABLE game
 	final boolean,
 	venue integer,
 	date timestamp with time zone,
-	notes integer[],
-	created timestamp with time zone NOT NULL DEFAULT now(),
-	createdby integer NOT NULL,
-	modified timestamp with time zone,
-	modifiedby integer
+	notes integer[]
 )
 WITH (
 	OIDS = FALSE
 );
 ALTER TABLE game OWNER TO scoreplus_owner;
+GRANT SELECT, USAGE ON SEQUENCE game_id_seq TO scoreplus_writer;
+GRANT SELECT ON SEQUENCE game_id_seq TO scoreplus_reader;
 
 -- member
 
 DROP TABLE IF EXISTS member CASCADE;
 CREATE TABLE member
 (
-	id serial NOT NULL PRIMARY KEY,
+	id serial PRIMARY KEY,
+	created timestamp with time zone NOT NULL DEFAULT now(),
+	createdby integer NOT NULL,
+	modified timestamp with time zone,
+	modifiedby integer,
 	handle text,
 	email text,
 	firstname text,
@@ -39,88 +45,94 @@ CREATE TABLE member
 	lastactive timestamp with time zone,
 	teams integer[],
 	follows integer[],
-	followers integer[],
-	created timestamp with time zone NOT NULL DEFAULT now(),
-	createdby integer NOT NULL,
-	modified timestamp with time zone,
-	modifiedby integer
+	followers integer[]
 )
 WITH (
 	OIDS = FALSE
 );
 ALTER TABLE member OWNER TO scoreplus_owner;
+GRANT SELECT, USAGE ON SEQUENCE member_id_seq TO scoreplus_writer;
+GRANT SELECT ON SEQUENCE member_id_seq TO scoreplus_reader;
 
 -- note
 
 DROP TABLE IF EXISTS note CASCADE;
 CREATE TABLE note
 (
-	id serial NOT NULL PRIMARY KEY,
-	message text,
+	id serial PRIMARY KEY,
 	created timestamp with time zone NOT NULL DEFAULT now(),
 	createdby integer NOT NULL,
 	modified timestamp with time zone,
-	modifiedby integer
+	modifiedby integer,
+	message text
 )
 WITH (
 	OIDS = FALSE
 );
 ALTER TABLE note OWNER TO scoreplus_owner;
+GRANT SELECT, USAGE ON SEQUENCE note_id_seq TO scoreplus_writer;
+GRANT SELECT ON SEQUENCE note_id_seq TO scoreplus_reader;
 
 -- sport
 
 DROP TABLE IF EXISTS sport CASCADE;
 CREATE TABLE sport
 (
-	id serial NOT NULL PRIMARY KEY,
-	name text,
+	id serial PRIMARY KEY,
 	created timestamp with time zone NOT NULL DEFAULT now(),
 	createdby integer NOT NULL,
 	modified timestamp with time zone,
-	modifiedby integer
+	modifiedby integer,
+	name text
 )
 WITH (
 	OIDS = FALSE
 );
 ALTER TABLE sport OWNER TO scoreplus_owner;
+GRANT SELECT, USAGE ON SEQUENCE sport_id_seq TO scoreplus_writer;
+GRANT SELECT ON SEQUENCE sport_id_seq TO scoreplus_reader;
 
 -- team
 
 DROP TABLE IF EXISTS team CASCADE;
 CREATE TABLE team
 (
-	id serial NOT NULL PRIMARY KEY,
+	id serial PRIMARY KEY,
+	created timestamp with time zone NOT NULL DEFAULT now(),
+	createdby integer NOT NULL,
+	modified timestamp with time zone,
+	modifiedby integer,
 	name text,
 	sport integer,
 	venue integer,
 	mascot text,
-	games integer[],
-	created timestamp with time zone NOT NULL DEFAULT now(),
-	createdby integer NOT NULL,
-	modified timestamp with time zone,
-	modifiedby integer
+	games integer[]
 )
 WITH (
 	OIDS = FALSE
 );
 ALTER TABLE team OWNER TO scoreplus_owner;
+GRANT SELECT, USAGE ON SEQUENCE team_id_seq TO scoreplus_writer;
+GRANT SELECT ON SEQUENCE team_id_seq TO scoreplus_reader;
 
 -- venue
 
 DROP TABLE IF EXISTS venue CASCADE;
 CREATE TABLE venue
 (
-	id serial NOT NULL PRIMARY KEY,
-	name text,
-	address text,
-	coordinates text,
+	id serial PRIMARY KEY,
 	created timestamp with time zone NOT NULL DEFAULT now(),
 	createdby integer NOT NULL,
 	modified timestamp with time zone,
-	modifiedby integer
+	modifiedby integer,
+	name text,
+	address text,
+	coordinates text
 )
 WITH (
 	OIDS = FALSE
 );
 ALTER TABLE venue OWNER TO scoreplus_owner;
+GRANT SELECT, USAGE ON SEQUENCE venue_id_seq TO scoreplus_writer;
+GRANT SELECT ON SEQUENCE venue_id_seq TO scoreplus_reader;
 

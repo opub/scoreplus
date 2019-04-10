@@ -26,11 +26,21 @@ func buildTableSQL(t reflect.Type) {
 	fmt.Printf("-- %s\n\nDROP TABLE IF EXISTS %s CASCADE;\nCREATE TABLE %s\n(\n", table, table, table)
 
 	for i := 0; i < t.NumField(); i++ {
-		buildColumnSQL(t.Field(i), i == t.NumField()-1)
+		field := t.Field(i)
+		if field.Type.String() == "model.Base" {
+			for j := 0; j < field.Type.NumField(); j++ {
+				if field.Type.Field(j).Type.Name() != "Model" {
+					buildColumnSQL(field.Type.Field(j), i == t.NumField()-1 && j == field.Type.NumField()-1)
+				}
+			}
+		} else {
+			buildColumnSQL(field, i == t.NumField()-1)
+		}
 	}
 
 	fmt.Println(")\nWITH (\n\tOIDS = FALSE\n);")
-	fmt.Printf("ALTER TABLE %s OWNER TO scoreplus_owner;\n\n", table)
+	fmt.Printf("ALTER TABLE %s OWNER TO scoreplus_owner;\n", table)
+	fmt.Printf("GRANT SELECT, USAGE ON SEQUENCE %s_id_seq TO scoreplus_writer;\nGRANT SELECT ON SEQUENCE %s_id_seq TO scoreplus_reader;\n\n", table, table)
 }
 
 func buildColumnSQL(f reflect.StructField, last bool) {
@@ -56,7 +66,7 @@ func buildColumnSQL(f reflect.StructField, last bool) {
 	}
 
 	if name == "id" && ctype == "integer" {
-		fmt.Printf("\t%s serial NOT NULL PRIMARY KEY", name)
+		fmt.Printf("\t%s serial PRIMARY KEY", name)
 	} else {
 		fmt.Printf("\t%s %s", name, ctype)
 	}

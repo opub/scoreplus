@@ -4,7 +4,7 @@ import "time"
 
 //Member data model
 type Member struct {
-	ID         int
+	Base
 	Handle     string
 	Email      string
 	FirstName  string
@@ -15,8 +15,4 @@ type Member struct {
 	Teams      []int
 	Follows    []int
 	Followers  []int
-	Created    time.Time `sql:" NOT NULL DEFAULT now()"`
-	CreatedBy  int       `sql:" NOT NULL"`
-	Modified   time.Time
-	ModifiedBy int
 }
