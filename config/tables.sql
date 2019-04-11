@@ -1,3 +1,4 @@
+arg0:  C:\Users\msn\AppData\Local\Temp\go-build827651450\b001\exe\build.exe
 -- game
 
 DROP TABLE IF EXISTS game CASCADE;
@@ -6,8 +7,8 @@ CREATE TABLE game
 	id serial PRIMARY KEY,
 	created timestamp with time zone NOT NULL DEFAULT now(),
 	createdby integer NOT NULL,
-	modified timestamp with time zone,
-	modifiedby integer,
+	modified timestamp with time zone NOT NULL DEFAULT now(),
+	modifiedby integer NOT NULL,
 	sport integer,
 	hometeam integer,
 	awayteam integer,
@@ -16,7 +17,6 @@ CREATE TABLE game
 	start timestamp with time zone,
 	final boolean,
 	venue integer,
-	date timestamp with time zone,
 	notes integer[]
 )
 WITH (
@@ -34,8 +34,8 @@ CREATE TABLE member
 	id serial PRIMARY KEY,
 	created timestamp with time zone NOT NULL DEFAULT now(),
 	createdby integer NOT NULL,
-	modified timestamp with time zone,
-	modifiedby integer,
+	modified timestamp with time zone NOT NULL DEFAULT now(),
+	modifiedby integer NOT NULL,
 	handle text,
 	email text,
 	firstname text,
@@ -62,8 +62,8 @@ CREATE TABLE note
 	id serial PRIMARY KEY,
 	created timestamp with time zone NOT NULL DEFAULT now(),
 	createdby integer NOT NULL,
-	modified timestamp with time zone,
-	modifiedby integer,
+	modified timestamp with time zone NOT NULL DEFAULT now(),
+	modifiedby integer NOT NULL,
 	message text
 )
 WITH (
@@ -81,8 +81,8 @@ CREATE TABLE sport
 	id serial PRIMARY KEY,
 	created timestamp with time zone NOT NULL DEFAULT now(),
 	createdby integer NOT NULL,
-	modified timestamp with time zone,
-	modifiedby integer,
+	modified timestamp with time zone NOT NULL DEFAULT now(),
+	modifiedby integer NOT NULL,
 	name text
 )
 WITH (
@@ -100,8 +100,8 @@ CREATE TABLE team
 	id serial PRIMARY KEY,
 	created timestamp with time zone NOT NULL DEFAULT now(),
 	createdby integer NOT NULL,
-	modified timestamp with time zone,
-	modifiedby integer,
+	modified timestamp with time zone NOT NULL DEFAULT now(),
+	modifiedby integer NOT NULL,
 	name text,
 	sport integer,
 	venue integer,
@@ -123,8 +123,8 @@ CREATE TABLE venue
 	id serial PRIMARY KEY,
 	created timestamp with time zone NOT NULL DEFAULT now(),
 	createdby integer NOT NULL,
-	modified timestamp with time zone,
-	modifiedby integer,
+	modified timestamp with time zone NOT NULL DEFAULT now(),
+	modifiedby integer NOT NULL,
 	name text,
 	address text,
 	coordinates text

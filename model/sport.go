@@ -1,32 +1,24 @@
 package model
 
-import "github.com/opub/scoreplus/db"
-
 //Sport data model
 type Sport struct {
 	Base
 	Name string
 }
 
-//Insert new record
-func (m *Sport) Insert() error {
-	db, err := db.Connect()
-	if err != nil {
-		return err
+//Save persists object to data store
+func (b *Sport) Save() error {
+	if b.ID == 0 {
+		return b.execSQL("INSERT INTO sport (name, createdby, modifiedby) VALUES (:name, 0, 0) RETURNING id", b)
 	}
-	tx, err := db.Begin()
-	if err != nil {
-		return err
-	}
-	_, err = tx.Exec("INSERT INTO sport (name, createdby) VALUES ($1, 1)", m.Name)
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-	return tx.Commit()
+	return b.execSQL("UPDATE sport SET name=:name, modifiedby=1, modified=now() WHERE id=:id", b)
 }
 
-//Update existing record
-func (m *Sport) Update() error {
-	return nil
+//Delete removes object from data store
+func (b *Sport) Delete() error {
+	err := b.execSQL("DELETE FROM sport WHERE id=:id", b)
+	if err == nil {
+		b.ID = 0
+	}
+	return err
 }

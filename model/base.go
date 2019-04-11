@@ -1,29 +1,79 @@
 package model
 
-import "time"
+import (
+	"fmt"
+	"reflect"
+	"strings"
+	"time"
+
+	"github.com/opub/scoreplus/db"
+)
 
 //Model data store operations
 type Model interface {
 	Save() error
-	Insert() error
-	Update() error
 	Delete() error
 }
 
 //Base model that provides common fields
 type Base struct {
 	Model
-	ID         int
+	ID         int64
 	Created    time.Time `sql:" NOT NULL DEFAULT now()"`
-	CreatedBy  int       `sql:" NOT NULL"`
-	Modified   time.Time
-	ModifiedBy int
+	CreatedBy  int64     `sql:" NOT NULL"`
+	Modified   time.Time `sql:" NOT NULL DEFAULT now()"`
+	ModifiedBy int64     `sql:" NOT NULL"`
 }
 
-//Save persists object to data store
-func (b *Base) Save() error {
-	if b.ID == 0 {
-		return b.Insert()
+//Get matching model from data store
+func Get(id int64, m interface{}) error {
+	db, err := db.Connect()
+	if err != nil {
+		return err
 	}
-	return b.Update()
+
+	table := strings.ToLower(reflect.TypeOf(m).Elem().Name())
+	sql := fmt.Sprintf("SELECT * FROM %s WHERE id=%d", table, id)
+
+	fmt.Println(sql)
+
+	//	return db.Get(&m, sql)
+
+	rows, err := db.Queryx(sql)
+	if rows.Next() {
+		err = rows.StructScan(m)
+		fmt.Printf("%#v\n", m)
+		return err
+	}
+	return nil
+}
+
+func (b *Base) execSQL(sql string, m interface{}) error {
+	db, err := db.Connect()
+	if err != nil {
+		return err
+	}
+
+	tx, err := db.Beginx()
+	if err != nil {
+		return err
+	}
+
+	stmt, err := tx.PrepareNamed(sql)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if strings.Contains(strings.ToUpper(sql), " RETURNING ") {
+		err = stmt.Get(&b.ID, m)
+	} else {
+		_, err = stmt.Exec(m)
+	}
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit()
 }
