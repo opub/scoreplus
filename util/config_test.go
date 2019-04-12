@@ -8,12 +8,12 @@ func TestGetConfig(t *testing.T) {
 		t.Errorf("error in GetConfig: %s", err)
 	}
 
-	if config.Salt == "" {
-		t.Errorf("no salt config loaded")
+	if config.Salt != "imW$OcsNQwy7XtVld@p&Nr#0mkN&qN33$M5*4ZNzmYe%95e&qUdE0f7!Lr0mPMoI" {
+		t.Errorf("salt config not loaded")
 	}
 
-	if config.DB.Name == "" || config.DB.Host == "" || config.DB.Port == 0 ||
-		config.DB.Username == "" || config.DB.Password == "" {
-		t.Errorf("no DB config loaded")
+	if config.DB.Name != "scoreplus_test" || config.DB.Host != "localhost" || config.DB.Port != 5432 ||
+		config.DB.Username != "scoreplus_user" || config.DB.Password != "8BcD2T3W6xpPjlXA9D#loRfQTz%p^zhT" {
+		t.Errorf("DB config not loaded")
 	}
 }

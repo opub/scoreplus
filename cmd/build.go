@@ -51,6 +51,8 @@ func buildColumnSQL(f reflect.StructField, last bool) {
 	switch gotype {
 	case "int":
 		ctype = "integer"
+	case "int64":
+		ctype = "bigint"
 	case "string":
 		ctype = "text"
 	case "bool":
@@ -59,13 +61,13 @@ func buildColumnSQL(f reflect.StructField, last bool) {
 		ctype = "timestamp with time zone"
 	case "":
 		//cheating because our only slices are all of ints
-		ctype = "integer[]"
+		ctype = "integer[] DEFAULT '{}'"
 	default:
 		//also cheating because nested structs have ints as FK
-		ctype = "integer"
+		ctype = "integer NOT NULL DEFAULT 0"
 	}
 
-	if name == "id" && ctype == "integer" {
+	if name == "id" && gotype == "int64" {
 		fmt.Printf("\t%s serial PRIMARY KEY", name)
 	} else {
 		fmt.Printf("\t%s %s", name, ctype)

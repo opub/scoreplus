@@ -1,6 +1,6 @@
 package model
 
-import "time"
+import "github.com/guregu/null"
 
 //Game data model
 type Game struct {
@@ -10,7 +10,7 @@ type Game struct {
 	AwayTeam  Team
 	HomeScore int
 	AwayScore int
-	Start     time.Time
+	Start     null.Time
 	Final     bool
 	Venue     Venue
 	Notes     []int

@@ -24,18 +24,19 @@ type Database struct {
 	Password string
 }
 
-var settings Config
+var config Config
 var testRE = regexp.MustCompile("_test|.test.exe$|(\\.test$)")
 
 //GetConfig gets application configuration settings based on current environment
 func GetConfig() (Config, error) {
-	if settings == (Config{}) {
-		err := loadConfig()
+	if config == (Config{}) {
+		var err error
+		config, err = loadConfig()
 		if err != nil {
-			return settings, err
+			return config, err
 		}
 	}
-	return settings, nil
+	return config, nil
 }
 
 func getEnvironment() string {
@@ -45,13 +46,12 @@ func getEnvironment() string {
 	if testRE.MatchString(os.Args[0]) {
 		return "test"
 	}
-	fmt.Println("arg0: ", os.Args[0])
-
 	return "dev"
 }
 
-func loadConfig() error {
+func loadConfig() (Config, error) {
 	env := getEnvironment()
+	fmt.Printf("ENV: %s\n", env)
 	viper.SetConfigName(env)
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath("./config")
@@ -60,7 +60,7 @@ func loadConfig() error {
 	viper.WatchConfig()
 	viper.OnConfigChange(func(e fsnotify.Event) {
 		fmt.Println("config file changed: ", e.Name)
-		viper.Unmarshal(&settings)
+		viper.Unmarshal(&config)
 	})
 
 	err := viper.ReadInConfig()
@@ -68,6 +68,7 @@ func loadConfig() error {
 		fmt.Printf("failed to read %s config: %s", env, err)
 	}
 
+	settings := Config{}
 	viper.Unmarshal(&settings)
-	return err
+	return settings, err
 }

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
-	"time"
 
+	"github.com/guregu/null"
 	"github.com/opub/scoreplus/db"
 )
 
@@ -19,10 +19,10 @@ type Model interface {
 type Base struct {
 	Model
 	ID         int64
-	Created    time.Time `sql:" NOT NULL DEFAULT now()"`
-	CreatedBy  int64     `sql:" NOT NULL"`
-	Modified   time.Time `sql:" NOT NULL DEFAULT now()"`
-	ModifiedBy int64     `sql:" NOT NULL"`
+	Created    null.Time `sql:" NOT NULL DEFAULT now()"`
+	CreatedBy  int64     `sql:" NOT NULL DEFAULT 0"`
+	Modified   null.Time
+	ModifiedBy int64 `sql:" NOT NULL DEFAULT 0"`
 }
 
 //Get matching model from data store

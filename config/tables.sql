@@ -1,4 +1,3 @@
-arg0:  C:\Users\msn\AppData\Local\Temp\go-build827651450\b001\exe\build.exe
 -- game
 
 DROP TABLE IF EXISTS game CASCADE;
@@ -6,18 +5,18 @@ CREATE TABLE game
 (
 	id serial PRIMARY KEY,
 	created timestamp with time zone NOT NULL DEFAULT now(),
-	createdby integer NOT NULL,
-	modified timestamp with time zone NOT NULL DEFAULT now(),
-	modifiedby integer NOT NULL,
-	sport integer,
-	hometeam integer,
-	awayteam integer,
+	createdby bigint NOT NULL DEFAULT 0,
+	modified timestamp with time zone,
+	modifiedby bigint NOT NULL DEFAULT 0,
+	sport integer NOT NULL DEFAULT 0,
+	hometeam integer NOT NULL DEFAULT 0,
+	awayteam integer NOT NULL DEFAULT 0,
 	homescore integer,
 	awayscore integer,
 	start timestamp with time zone,
 	final boolean,
-	venue integer,
-	notes integer[]
+	venue integer NOT NULL DEFAULT 0,
+	notes integer[] DEFAULT '{}'
 )
 WITH (
 	OIDS = FALSE
@@ -33,9 +32,9 @@ CREATE TABLE member
 (
 	id serial PRIMARY KEY,
 	created timestamp with time zone NOT NULL DEFAULT now(),
-	createdby integer NOT NULL,
-	modified timestamp with time zone NOT NULL DEFAULT now(),
-	modifiedby integer NOT NULL,
+	createdby bigint NOT NULL DEFAULT 0,
+	modified timestamp with time zone,
+	modifiedby bigint NOT NULL DEFAULT 0,
 	handle text,
 	email text,
 	firstname text,
@@ -43,9 +42,9 @@ CREATE TABLE member
 	verified boolean,
 	enabled boolean,
 	lastactive timestamp with time zone,
-	teams integer[],
-	follows integer[],
-	followers integer[]
+	teams integer[] DEFAULT '{}',
+	follows integer[] DEFAULT '{}',
+	followers integer[] DEFAULT '{}'
 )
 WITH (
 	OIDS = FALSE
@@ -61,9 +60,9 @@ CREATE TABLE note
 (
 	id serial PRIMARY KEY,
 	created timestamp with time zone NOT NULL DEFAULT now(),
-	createdby integer NOT NULL,
-	modified timestamp with time zone NOT NULL DEFAULT now(),
-	modifiedby integer NOT NULL,
+	createdby bigint NOT NULL DEFAULT 0,
+	modified timestamp with time zone,
+	modifiedby bigint NOT NULL DEFAULT 0,
 	message text
 )
 WITH (
@@ -80,9 +79,9 @@ CREATE TABLE sport
 (
 	id serial PRIMARY KEY,
 	created timestamp with time zone NOT NULL DEFAULT now(),
-	createdby integer NOT NULL,
-	modified timestamp with time zone NOT NULL DEFAULT now(),
-	modifiedby integer NOT NULL,
+	createdby bigint NOT NULL DEFAULT 0,
+	modified timestamp with time zone,
+	modifiedby bigint NOT NULL DEFAULT 0,
 	name text
 )
 WITH (
@@ -99,14 +98,14 @@ CREATE TABLE team
 (
 	id serial PRIMARY KEY,
 	created timestamp with time zone NOT NULL DEFAULT now(),
-	createdby integer NOT NULL,
-	modified timestamp with time zone NOT NULL DEFAULT now(),
-	modifiedby integer NOT NULL,
+	createdby bigint NOT NULL DEFAULT 0,
+	modified timestamp with time zone,
+	modifiedby bigint NOT NULL DEFAULT 0,
 	name text,
-	sport integer,
-	venue integer,
+	sport integer NOT NULL DEFAULT 0,
+	venue integer NOT NULL DEFAULT 0,
 	mascot text,
-	games integer[]
+	games integer[] DEFAULT '{}'
 )
 WITH (
 	OIDS = FALSE
@@ -122,9 +121,9 @@ CREATE TABLE venue
 (
 	id serial PRIMARY KEY,
 	created timestamp with time zone NOT NULL DEFAULT now(),
-	createdby integer NOT NULL,
-	modified timestamp with time zone NOT NULL DEFAULT now(),
-	modifiedby integer NOT NULL,
+	createdby bigint NOT NULL DEFAULT 0,
+	modified timestamp with time zone,
+	modifiedby bigint NOT NULL DEFAULT 0,
 	name text,
 	address text,
 	coordinates text

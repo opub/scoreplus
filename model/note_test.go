@@ -6,9 +6,9 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestSportCRUD(t *testing.T) {
+func TestNoteCRUD(t *testing.T) {
 	//create
-	m1 := Sport{Name: "Football"}
+	m1 := Note{Message: "game delayed by rain"}
 	err := m1.Save()
 	if err != nil {
 		t.Errorf("insert failed: %v", err)
@@ -16,13 +16,13 @@ func TestSportCRUD(t *testing.T) {
 	if m1.ID == 0 {
 		t.Errorf("id not set after insert")
 	}
-	if m1.Name != "Football" {
-		t.Errorf("name not persisted on insert")
+	if m1.Message != "game delayed by rain" {
+		t.Errorf("Message not persisted on insert")
 	}
 
 	//read
 	id := m1.ID
-	m2 := Sport{}
+	m2 := Note{}
 	err = Get(id, &m2)
 	if err != nil {
 		t.Errorf("select failed: %v", err)
@@ -32,7 +32,7 @@ func TestSportCRUD(t *testing.T) {
 	}
 
 	//update
-	m1.Name = "Soccer"
+	m1.Message = "game has been rescheduled"
 	err = m1.Save()
 	if err != nil {
 		t.Errorf("update failed: %v", err)
@@ -40,8 +40,8 @@ func TestSportCRUD(t *testing.T) {
 	if m1.ID != id {
 		t.Errorf("id changed during update")
 	}
-	if m1.Name != "Soccer" {
-		t.Errorf("name not persisted on update")
+	if m1.Message != "game has been rescheduled" {
+		t.Errorf("Message not persisted on update")
 	}
 
 	//delete

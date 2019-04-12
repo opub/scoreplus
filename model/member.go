@@ -1,6 +1,6 @@
 package model
 
-import "time"
+import "github.com/guregu/null"
 
 //Member data model
 type Member struct {
@@ -11,7 +11,7 @@ type Member struct {
 	LastName   string
 	Verified   bool
 	Enabled    bool
-	LastActive time.Time
+	LastActive null.Time
 	Teams      []int
 	Follows    []int
 	Followers  []int
