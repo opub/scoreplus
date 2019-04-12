@@ -1,11 +1,5 @@
 package model
 
-import (
-	"time"
-
-	"github.com/guregu/null"
-)
-
 //Note data model
 type Note struct {
 	Base
@@ -15,10 +9,10 @@ type Note struct {
 //Save persists object to data store
 func (b *Note) Save() error {
 	if b.ID == 0 {
-		b.Created = null.Time{Time: time.Now().Truncate(time.Microsecond), Valid: true}
+		b.Created = NullTimeNow()
 		return b.execSQL("INSERT INTO note (message, created, createdby) VALUES (:message, :created, :createdby) RETURNING id", b)
 	}
-	b.Modified = null.Time{Time: time.Now().Truncate(time.Microsecond), Valid: true}
+	b.Modified = NullTimeNow()
 	return b.execSQL("UPDATE note SET message=:message, modified=:modified, modifiedby=:modifiedby WHERE id=:id", b)
 }
 

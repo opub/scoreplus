@@ -51,7 +51,6 @@ func getEnvironment() string {
 
 func loadConfig() (Config, error) {
 	env := getEnvironment()
-	fmt.Printf("ENV: %s\n", env)
 	viper.SetConfigName(env)
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath("./config")

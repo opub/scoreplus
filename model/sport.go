@@ -1,11 +1,5 @@
 package model
 
-import (
-	"time"
-
-	"github.com/guregu/null"
-)
-
 //Sport data model
 type Sport struct {
 	Base
@@ -15,10 +9,10 @@ type Sport struct {
 //Save persists object to data store
 func (b *Sport) Save() error {
 	if b.ID == 0 {
-		b.Created = null.Time{Time: time.Now().Truncate(time.Microsecond), Valid: true}
+		b.Created = NullTimeNow()
 		return b.execSQL("INSERT INTO sport (name, created, createdby) VALUES (:name, :created, :createdby) RETURNING id", b)
 	}
-	b.Modified = null.Time{Time: time.Now().Truncate(time.Microsecond), Valid: true}
+	b.Modified = NullTimeNow()
 	return b.execSQL("UPDATE sport SET name=:name, modified=:modified, modifiedby=:modifiedby WHERE id=:id", b)
 }
 

@@ -17,7 +17,7 @@ func TestNoteCRUD(t *testing.T) {
 		t.Errorf("id not set after insert")
 	}
 	if m1.Message != "game delayed by rain" {
-		t.Errorf("Message not persisted on insert")
+		t.Errorf("data not persisted on insert")
 	}
 
 	//read
@@ -41,7 +41,7 @@ func TestNoteCRUD(t *testing.T) {
 		t.Errorf("id changed during update")
 	}
 	if m1.Message != "game has been rescheduled" {
-		t.Errorf("Message not persisted on update")
+		t.Errorf("data not persisted on update")
 	}
 
 	//delete

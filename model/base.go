@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/guregu/null"
 	"github.com/opub/scoreplus/db"
@@ -46,6 +47,11 @@ func Get(id int64, m interface{}) error {
 		return err
 	}
 	return nil
+}
+
+// NullTimeNow returns a time.Now() representation truncated to a microsecond to match database precision
+func NullTimeNow() null.Time {
+	return null.Time{Time: time.Now().Truncate(time.Microsecond), Valid: true}
 }
 
 func (b *Base) execSQL(sql string, m interface{}) error {
