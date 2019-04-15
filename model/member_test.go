@@ -6,9 +6,11 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestNoteCRUD(t *testing.T) {
+func TestMemberCRUD(t *testing.T) {
 	//create
-	m1 := Note{Message: "game delayed by rain"}
+	handle := random()
+	email := handle + "@score.plus"
+	m1 := Member{Handle: handle, Email: email, FirstName: "John", LastName: "Doe"}
 	err := m1.Save()
 	if err != nil {
 		t.Errorf("insert failed: %v", err)
@@ -16,13 +18,13 @@ func TestNoteCRUD(t *testing.T) {
 	if m1.ID == 0 {
 		t.Errorf("id not set after insert")
 	}
-	if m1.Message != "game delayed by rain" {
+	if m1.Handle != handle || m1.Email != email || m1.FirstName != "John" || m1.LastName != "Doe" {
 		t.Errorf("data not persisted on insert")
 	}
 
 	//read
 	id := m1.ID
-	m2 := Note{}
+	m2 := Member{}
 	err = Get(id, &m2)
 	if err != nil {
 		t.Errorf("select failed: %v", err)
@@ -32,7 +34,7 @@ func TestNoteCRUD(t *testing.T) {
 	}
 
 	//update
-	m1.Message = "game has been rescheduled"
+	m1.FirstName = "Jane"
 	err = m1.Save()
 	if err != nil {
 		t.Errorf("update failed: %v", err)
@@ -40,7 +42,7 @@ func TestNoteCRUD(t *testing.T) {
 	if m1.ID != id {
 		t.Errorf("id changed during update")
 	}
-	if m1.Message != "game has been rescheduled" {
+	if m1.FirstName != "Jane" {
 		t.Errorf("data not persisted on update")
 	}
 

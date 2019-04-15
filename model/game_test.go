@@ -6,9 +6,15 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestNoteCRUD(t *testing.T) {
+var sport = getSport()
+var team1 = getTeam()
+var team2 = getTeam()
+
+func TestGameCRUD(t *testing.T) {
+	defer cleanup()
+
 	//create
-	m1 := Note{Message: "game delayed by rain"}
+	m1 := Game{Sport: sport, HomeTeam: team1, AwayTeam: team2, HomeScore: 10, AwayScore: 1}
 	err := m1.Save()
 	if err != nil {
 		t.Errorf("insert failed: %v", err)
@@ -16,13 +22,13 @@ func TestNoteCRUD(t *testing.T) {
 	if m1.ID == 0 {
 		t.Errorf("id not set after insert")
 	}
-	if m1.Message != "game delayed by rain" {
+	if m1.HomeScore != 10 || m1.AwayScore != 1 {
 		t.Errorf("data not persisted on insert")
 	}
 
 	//read
 	id := m1.ID
-	m2 := Note{}
+	m2 := Game{}
 	err = Get(id, &m2)
 	if err != nil {
 		t.Errorf("select failed: %v", err)
@@ -32,7 +38,8 @@ func TestNoteCRUD(t *testing.T) {
 	}
 
 	//update
-	m1.Message = "game has been rescheduled"
+	m1.HomeScore = 11
+	m1.AwayScore = 2
 	err = m1.Save()
 	if err != nil {
 		t.Errorf("update failed: %v", err)
@@ -40,7 +47,7 @@ func TestNoteCRUD(t *testing.T) {
 	if m1.ID != id {
 		t.Errorf("id changed during update")
 	}
-	if m1.Message != "game has been rescheduled" {
+	if m1.HomeScore != 11 || m1.AwayScore != 2 {
 		t.Errorf("data not persisted on update")
 	}
 
@@ -52,4 +59,10 @@ func TestNoteCRUD(t *testing.T) {
 	if m1.ID != 0 {
 		t.Errorf("id not cleared during delete")
 	}
+}
+
+func cleanup() {
+	sport.Delete()
+	team1.Delete()
+	team2.Delete()
 }

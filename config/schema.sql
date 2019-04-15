@@ -45,3 +45,10 @@ ALTER DEFAULT PRIVILEGES
 ALTER DEFAULT PRIVILEGES 
     GRANT INSERT, SELECT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER ON TABLES
     TO scoreplus_writer;
+
+-- custom types
+
+CREATE EXTENSION citext;
+
+CREATE DOMAIN email AS citext
+  CHECK ( value ~ '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$' );

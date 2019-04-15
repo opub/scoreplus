@@ -66,8 +66,11 @@ func buildColumnSQL(f reflect.StructField, last bool) {
 		ctype = "integer NOT NULL DEFAULT 0"
 	}
 
+	//couple special cases
 	if name == "id" && gotype == "int64" {
 		fmt.Printf("\t%s serial PRIMARY KEY", name)
+	} else if name == "email" && gotype == "string" {
+		fmt.Printf("\t%s email", name)
 	} else {
 		fmt.Printf("\t%s %s", name, ctype)
 	}

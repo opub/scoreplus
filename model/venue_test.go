@@ -28,7 +28,7 @@ func TestVenueCRUD(t *testing.T) {
 		t.Errorf("select failed: %v", err)
 	}
 	if !cmp.Equal(m1, m2) {
-		t.Errorf("read data doesn't match:\nm1: %v\nm2: %v", m1, m2)
+		t.Errorf("read data doesn't match:\nm1: %+v\nm2: %+v", m1, m2)
 	}
 
 	//update

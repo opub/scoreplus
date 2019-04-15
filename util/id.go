@@ -20,15 +20,15 @@ func init() {
 	data := hashids.NewData()
 	data.Salt = config.Salt
 	data.Alphabet = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789" //remove ambiguous chars
-	data.MinLength = 12
+	data.MinLength = 6
 	hi, _ = hashids.NewWithData(data)
 
 	//make rand nondeterministic
 	rand.Seed(time.Now().UnixNano())
 }
 
-//NewID produces a new ID for use throughout application
-func NewID() (string, error) {
+//RandomID produces a new random ID
+func RandomID() (string, error) {
 
 	//our id is based on current epoch nanoseconds and a pseudo-random 63-bit int for uniqueness
 	now := int(time.Now().Unix() - baseTime)
