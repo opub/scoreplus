@@ -1,6 +1,9 @@
 package model
 
-import "github.com/guregu/null"
+import (
+	"github.com/guregu/null"
+	"github.com/lib/pq"
+)
 
 //Game data model
 type Game struct {
@@ -13,5 +16,5 @@ type Game struct {
 	Start     null.Time
 	Final     bool
 	Venue     Venue
-	Notes     []int
+	Notes     pq.Int64Array
 }

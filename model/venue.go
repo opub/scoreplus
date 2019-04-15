@@ -1,5 +1,7 @@
 package model
 
+import "database/sql/driver"
+
 //Venue data model
 type Venue struct {
 	Base
@@ -9,20 +11,31 @@ type Venue struct {
 }
 
 //Save persists object to data store
-func (b *Venue) Save() error {
-	if b.ID == 0 {
-		b.Created = NullTimeNow()
-		return b.execSQL("INSERT INTO venue (name, address, coordinates, created, createdby) VALUES (:name, :address, :coordinates, :created, :createdby) RETURNING id", b)
+func (v *Venue) Save() error {
+	if v.ID == 0 {
+		v.Created = NullTimeNow()
+		return v.execSQL("INSERT INTO venue (name, address, coordinates, created, createdby) VALUES (:name, :address, :coordinates, :created, :createdby) RETURNING id", v)
 	}
-	b.Modified = NullTimeNow()
-	return b.execSQL("UPDATE venue SET name=:name, address=:address, coordinates=:coordinates, modified=:modified, modifiedby=:modifiedby WHERE id=:id", b)
+	v.Modified = NullTimeNow()
+	return v.execSQL("UPDATE venue SET name=:name, address=:address, coordinates=:coordinates, modified=:modified, modifiedby=:modifiedby WHERE id=:id", v)
 }
 
 //Delete removes object from data store
-func (b *Venue) Delete() error {
-	err := b.execSQL("DELETE FROM venue WHERE id=:id", b)
+func (v *Venue) Delete() error {
+	err := v.execSQL("DELETE FROM venue WHERE id=:id", v)
 	if err == nil {
-		b.ID = 0
+		v.ID = 0
 	}
 	return err
+}
+
+//Scan implements driver Scanner interface
+func (v *Venue) Scan(value interface{}) error {
+	v.ID = value.(int64)
+	return nil
+}
+
+//Value implements the driver Valuer interface
+func (v Venue) Value() (driver.Value, error) {
+	return v.ID, nil
 }

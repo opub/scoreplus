@@ -1,6 +1,9 @@
 package model
 
-import "github.com/guregu/null"
+import (
+	"github.com/guregu/null"
+	"github.com/lib/pq"
+)
 
 //Member data model
 type Member struct {
@@ -12,7 +15,7 @@ type Member struct {
 	Verified   bool
 	Enabled    bool
 	LastActive null.Time
-	Teams      []int
-	Follows    []int
-	Followers  []int
+	Teams      pq.Int64Array
+	Follows    pq.Int64Array
+	Followers  pq.Int64Array
 }

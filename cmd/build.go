@@ -52,18 +52,17 @@ func buildColumnSQL(f reflect.StructField, last bool) {
 	case "int":
 		ctype = "integer"
 	case "int64":
-		ctype = "bigint"
+		ctype = "integer"
 	case "string":
 		ctype = "text"
 	case "bool":
 		ctype = "boolean"
 	case "Time":
 		ctype = "timestamp with time zone"
-	case "":
-		//cheating because our only slices are all of ints
+	case "Int64Array":
 		ctype = "integer[] DEFAULT '{}'"
 	default:
-		//also cheating because nested structs have ints as FK
+		//cheating because nested structs have ints as FK
 		ctype = "integer NOT NULL DEFAULT 0"
 	}
 

@@ -5,9 +5,9 @@ CREATE TABLE game
 (
 	id serial PRIMARY KEY,
 	created timestamp with time zone NOT NULL DEFAULT now(),
-	createdby bigint NOT NULL DEFAULT 0,
+	createdby integer NOT NULL DEFAULT 0,
 	modified timestamp with time zone,
-	modifiedby bigint NOT NULL DEFAULT 0,
+	modifiedby integer NOT NULL DEFAULT 0,
 	sport integer NOT NULL DEFAULT 0,
 	hometeam integer NOT NULL DEFAULT 0,
 	awayteam integer NOT NULL DEFAULT 0,
@@ -32,9 +32,9 @@ CREATE TABLE member
 (
 	id serial PRIMARY KEY,
 	created timestamp with time zone NOT NULL DEFAULT now(),
-	createdby bigint NOT NULL DEFAULT 0,
+	createdby integer NOT NULL DEFAULT 0,
 	modified timestamp with time zone,
-	modifiedby bigint NOT NULL DEFAULT 0,
+	modifiedby integer NOT NULL DEFAULT 0,
 	handle text,
 	email text,
 	firstname text,
@@ -60,9 +60,9 @@ CREATE TABLE note
 (
 	id serial PRIMARY KEY,
 	created timestamp with time zone NOT NULL DEFAULT now(),
-	createdby bigint NOT NULL DEFAULT 0,
+	createdby integer NOT NULL DEFAULT 0,
 	modified timestamp with time zone,
-	modifiedby bigint NOT NULL DEFAULT 0,
+	modifiedby integer NOT NULL DEFAULT 0,
 	message text
 )
 WITH (
@@ -79,9 +79,9 @@ CREATE TABLE sport
 (
 	id serial PRIMARY KEY,
 	created timestamp with time zone NOT NULL DEFAULT now(),
-	createdby bigint NOT NULL DEFAULT 0,
+	createdby integer NOT NULL DEFAULT 0,
 	modified timestamp with time zone,
-	modifiedby bigint NOT NULL DEFAULT 0,
+	modifiedby integer NOT NULL DEFAULT 0,
 	name text
 )
 WITH (
@@ -98,9 +98,9 @@ CREATE TABLE team
 (
 	id serial PRIMARY KEY,
 	created timestamp with time zone NOT NULL DEFAULT now(),
-	createdby bigint NOT NULL DEFAULT 0,
+	createdby integer NOT NULL DEFAULT 0,
 	modified timestamp with time zone,
-	modifiedby bigint NOT NULL DEFAULT 0,
+	modifiedby integer NOT NULL DEFAULT 0,
 	name text,
 	sport integer NOT NULL DEFAULT 0,
 	venue integer NOT NULL DEFAULT 0,
@@ -121,9 +121,9 @@ CREATE TABLE venue
 (
 	id serial PRIMARY KEY,
 	created timestamp with time zone NOT NULL DEFAULT now(),
-	createdby bigint NOT NULL DEFAULT 0,
+	createdby integer NOT NULL DEFAULT 0,
 	modified timestamp with time zone,
-	modifiedby bigint NOT NULL DEFAULT 0,
+	modifiedby integer NOT NULL DEFAULT 0,
 	name text,
 	address text,
 	coordinates text
