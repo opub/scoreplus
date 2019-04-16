@@ -30,7 +30,6 @@ type Base struct {
 //Delete removes object from data store
 func (b *Base) delete(table string) error {
 	sql := fmt.Sprintf("DELETE FROM %s WHERE id=:id", table)
-	fmt.Println(sql)
 	err := b.execSQL(sql, b)
 	if err == nil {
 		b.ID = 0

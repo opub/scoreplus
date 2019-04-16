@@ -20,7 +20,7 @@ func init() {
 	data := hashids.NewData()
 	data.Salt = config.Salt
 	data.Alphabet = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789" //remove ambiguous chars
-	data.MinLength = 6
+	data.MinLength = 10
 	hi, _ = hashids.NewWithData(data)
 
 	//make rand nondeterministic
@@ -29,10 +29,9 @@ func init() {
 
 //RandomID produces a new random ID
 func RandomID() (string, error) {
-
 	//our id is based on current epoch nanoseconds and a pseudo-random 63-bit int for uniqueness
 	now := int(time.Now().Unix() - baseTime)
-	rnd := rand.Intn(100000)
+	rnd := rand.Intn(10000)
 
 	id, err := hi.Encode([]int{now, rnd})
 	if err != nil {
