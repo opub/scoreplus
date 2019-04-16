@@ -33,3 +33,28 @@ func (g *Game) Save() error {
 func (g *Game) Delete() error {
 	return g.delete("game")
 }
+
+//SelectGames from data store where ID in slice
+func SelectGames(ids []int64) ([]Game, error) {
+	rows, err := selectRows(ids, "game")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	results := make([]Game, 0)
+	for rows.Next() {
+		g := Game{}
+		err = rows.StructScan(&g)
+		if err != nil {
+			return nil, err
+		}
+		results = append(results, g)
+	}
+	return results, nil
+}
+
+//SelectAllGames from data store
+func SelectAllGames() ([]Game, error) {
+	return SelectGames(nil)
+}

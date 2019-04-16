@@ -55,3 +55,37 @@ func TestVenueCRUD(t *testing.T) {
 		t.Errorf("id not cleared during delete")
 	}
 }
+
+func TestVenueSelect(t *testing.T) {
+	v1 := testVenue()
+	defer v1.Delete()
+	v2 := testVenue()
+	defer v2.Delete()
+	v3 := testVenue()
+	defer v3.Delete()
+	expected := []Venue{v1, v2, v3}
+
+	results, err := SelectVenues([]int64{v1.ID, v2.ID, v3.ID})
+	if err != nil {
+		t.Errorf("select failed: %v", err)
+	}
+
+	if !cmp.Equal(results, expected) {
+		t.Errorf("select results don't match:\nexpected: %+v\nresults: %+v", expected, results)
+	}
+
+	results, err = SelectAllVenues()
+	if err != nil {
+		t.Errorf("select all failed: %v", err)
+	}
+
+	if len(results) < len(expected) {
+		t.Errorf("select all missing results:\n%+v", results)
+	}
+}
+
+func testVenue() Venue {
+	v := Venue{Name: random(), Address: random(), Coordinates: random()}
+	v.Save()
+	return v
+}

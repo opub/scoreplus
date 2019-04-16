@@ -58,8 +58,11 @@ func TestNoteCRUD(t *testing.T) {
 
 func TestNoteSelect(t *testing.T) {
 	n1 := testNote()
+	defer n1.Delete()
 	n2 := testNote()
+	defer n2.Delete()
 	n3 := testNote()
+	defer n3.Delete()
 	expected := []Note{n1, n2, n3}
 
 	results, err := SelectNotes([]int64{n1.ID, n2.ID, n3.ID})
@@ -71,9 +74,14 @@ func TestNoteSelect(t *testing.T) {
 		t.Errorf("select results don't match:\nexpected: %+v\nresults: %+v", expected, results)
 	}
 
-	n1.Delete()
-	n2.Delete()
-	n3.Delete()
+	results, err = SelectAllNotes()
+	if err != nil {
+		t.Errorf("select all failed: %v", err)
+	}
+
+	if len(results) < len(expected) {
+		t.Errorf("select all missing results:\n%+v", results)
+	}
 }
 
 func testNote() Note {

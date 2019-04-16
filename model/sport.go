@@ -20,3 +20,28 @@ func (s *Sport) Save() error {
 func (s *Sport) Delete() error {
 	return s.delete("sport")
 }
+
+//SelectSports from data store where ID in slice
+func SelectSports(ids []int64) ([]Sport, error) {
+	rows, err := selectRows(ids, "sport")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	results := make([]Sport, 0)
+	for rows.Next() {
+		s := Sport{}
+		err = rows.StructScan(&s)
+		if err != nil {
+			return nil, err
+		}
+		results = append(results, s)
+	}
+	return results, nil
+}
+
+//SelectAllSports from data store
+func SelectAllSports() ([]Sport, error) {
+	return SelectSports(nil)
+}

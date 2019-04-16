@@ -4,17 +4,19 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/guregu/null"
 )
 
-var sport = getSport()
-var team1 = getTeam()
-var team2 = getTeam()
-
 func TestGameCRUD(t *testing.T) {
-	defer cleanup()
+	s := testSimpleSport()
+	defer s.Delete()
+	t1 := testSimpleTeam()
+	defer t1.Delete()
+	t2 := testSimpleTeam()
+	defer t2.Delete()
 
 	//create
-	m1 := Game{Sport: sport, HomeTeam: team1, AwayTeam: team2, HomeScore: 10, AwayScore: 1}
+	m1 := Game{Sport: s, HomeTeam: t1, AwayTeam: t2, HomeScore: 10, AwayScore: 1}
 	err := m1.Save()
 	if err != nil {
 		t.Errorf("insert failed: %v", err)
@@ -61,8 +63,53 @@ func TestGameCRUD(t *testing.T) {
 	}
 }
 
-func cleanup() {
-	sport.Delete()
-	team1.Delete()
-	team2.Delete()
+func TestGameSelect(t *testing.T) {
+	g1 := testGame()
+	defer g1.Delete()
+	g2 := testGame()
+	defer g2.Delete()
+	g3 := testGame()
+	defer g3.Delete()
+	expected := []Game{g1, g2, g3}
+
+	results, err := SelectGames([]int64{g1.ID, g2.ID, g3.ID})
+	if err != nil {
+		t.Errorf("select failed: %v", err)
+	}
+
+	if !cmp.Equal(results, expected) {
+		t.Errorf("select results don't match:\nexpected: %+v\nresults: %+v", expected, results)
+	}
+
+	results, err = SelectAllGames()
+	if err != nil {
+		t.Errorf("select all failed: %v", err)
+	}
+
+	if len(results) < len(expected) {
+		t.Errorf("select all missing results:\n%+v", results)
+	}
+}
+
+func testGame() Game {
+	g := Game{HomeScore: 101, AwayScore: 99, Final: true, Start: nullTimeNow()}
+	g.Save()
+	return g
+}
+
+func testSimpleSport() Sport {
+	s := testSport()
+	s.Name = ""
+	s.Created = null.Time{}
+	s.CreatedBy = 0
+	return s
+}
+
+func testSimpleTeam() Team {
+	t := testTeam()
+	t.Name = ""
+	t.Mascot = ""
+	t.Created = null.Time{}
+	t.CreatedBy = 0
+	return t
 }

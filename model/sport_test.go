@@ -53,3 +53,37 @@ func TestSportCRUD(t *testing.T) {
 		t.Errorf("id not cleared during delete")
 	}
 }
+
+func TestSportSelect(t *testing.T) {
+	s1 := testSport()
+	defer s1.Delete()
+	s2 := testSport()
+	defer s2.Delete()
+	s3 := testSport()
+	defer s3.Delete()
+	expected := []Sport{s1, s2, s3}
+
+	results, err := SelectSports([]int64{s1.ID, s2.ID, s3.ID})
+	if err != nil {
+		t.Errorf("select failed: %v", err)
+	}
+
+	if !cmp.Equal(results, expected) {
+		t.Errorf("select results don't match:\nexpected: %+v\nresults: %+v", expected, results)
+	}
+
+	results, err = SelectAllSports()
+	if err != nil {
+		t.Errorf("select all failed: %v", err)
+	}
+
+	if len(results) < len(expected) {
+		t.Errorf("select all missing results:\n%+v", results)
+	}
+}
+
+func testSport() Sport {
+	s := Sport{Name: random()}
+	s.Save()
+	return s
+}

@@ -28,3 +28,28 @@ func (t *Team) Save() error {
 func (t *Team) Delete() error {
 	return t.delete("team")
 }
+
+//SelectTeams from data store where ID in slice
+func SelectTeams(ids []int64) ([]Team, error) {
+	rows, err := selectRows(ids, "team")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	results := make([]Team, 0)
+	for rows.Next() {
+		t := Team{}
+		err = rows.StructScan(&t)
+		if err != nil {
+			return nil, err
+		}
+		results = append(results, t)
+	}
+	return results, nil
+}
+
+//SelectAllTeams from data store
+func SelectAllTeams() ([]Team, error) {
+	return SelectTeams(nil)
+}

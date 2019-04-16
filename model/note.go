@@ -29,14 +29,19 @@ func SelectNotes(ids []int64) ([]Note, error) {
 	}
 	defer rows.Close()
 
-	slice := make([]Note, 0)
+	results := make([]Note, 0)
 	for rows.Next() {
 		n := Note{}
 		err = rows.StructScan(&n)
 		if err != nil {
 			return nil, err
 		}
-		slice = append(slice, n)
+		results = append(results, n)
 	}
-	return slice, nil
+	return results, nil
+}
+
+//SelectAllNotes from data store
+func SelectAllNotes() ([]Note, error) {
+	return SelectNotes(nil)
 }

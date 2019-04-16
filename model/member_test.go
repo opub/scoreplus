@@ -55,3 +55,38 @@ func TestMemberCRUD(t *testing.T) {
 		t.Errorf("id not cleared during delete")
 	}
 }
+
+func TestMemberSelect(t *testing.T) {
+	m1 := testMember()
+	defer m1.Delete()
+	m2 := testMember()
+	defer m2.Delete()
+	m3 := testMember()
+	defer m3.Delete()
+	expected := []Member{m1, m2, m3}
+
+	results, err := SelectMembers([]int64{m1.ID, m2.ID, m3.ID})
+	if err != nil {
+		t.Errorf("select failed: %v", err)
+	}
+
+	if !cmp.Equal(results, expected) {
+		t.Errorf("select results don't match:\nexpected: %+v\nresults: %+v", expected, results)
+	}
+
+	results, err = SelectAllMembers()
+	if err != nil {
+		t.Errorf("select all failed: %v", err)
+	}
+
+	if len(results) < len(expected) {
+		t.Errorf("select all missing results:\n%+v", results)
+	}
+}
+
+func testMember() Member {
+	handle := random()
+	m := Member{Handle: handle, Email: handle + "@score.plus", FirstName: handle, LastName: handle}
+	m.Save()
+	return m
+}

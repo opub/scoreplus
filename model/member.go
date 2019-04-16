@@ -34,3 +34,28 @@ func (m *Member) Save() error {
 func (m *Member) Delete() error {
 	return m.delete("member")
 }
+
+//SelectMembers from data store where ID in slice
+func SelectMembers(ids []int64) ([]Member, error) {
+	rows, err := selectRows(ids, "member")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	results := make([]Member, 0)
+	for rows.Next() {
+		m := Member{}
+		err = rows.StructScan(&m)
+		if err != nil {
+			return nil, err
+		}
+		results = append(results, m)
+	}
+	return results, nil
+}
+
+//SelectAllMembers from data store
+func SelectAllMembers() ([]Member, error) {
+	return SelectMembers(nil)
+}

@@ -22,3 +22,28 @@ func (v *Venue) Save() error {
 func (v *Venue) Delete() error {
 	return v.delete("venue")
 }
+
+//SelectVenues from data store where ID in slice
+func SelectVenues(ids []int64) ([]Venue, error) {
+	rows, err := selectRows(ids, "venue")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	results := make([]Venue, 0)
+	for rows.Next() {
+		v := Venue{}
+		err = rows.StructScan(&v)
+		if err != nil {
+			return nil, err
+		}
+		results = append(results, v)
+	}
+	return results, nil
+}
+
+//SelectAllVenues from data store
+func SelectAllVenues() ([]Venue, error) {
+	return SelectVenues(nil)
+}

@@ -53,3 +53,37 @@ func TestTeamCRUD(t *testing.T) {
 		t.Errorf("id not cleared during delete")
 	}
 }
+
+func TestTeamSelect(t *testing.T) {
+	t1 := testTeam()
+	defer t1.Delete()
+	t2 := testTeam()
+	defer t2.Delete()
+	t3 := testTeam()
+	defer t3.Delete()
+	expected := []Team{t1, t2, t3}
+
+	results, err := SelectTeams([]int64{t1.ID, t2.ID, t3.ID})
+	if err != nil {
+		t.Errorf("select failed: %v", err)
+	}
+
+	if !cmp.Equal(results, expected) {
+		t.Errorf("select results don't match:\nexpected: %+v\nresults: %+v", expected, results)
+	}
+
+	results, err = SelectAllTeams()
+	if err != nil {
+		t.Errorf("select all failed: %v", err)
+	}
+
+	if len(results) < len(expected) {
+		t.Errorf("select all missing results:\n%+v", results)
+	}
+}
+
+func testTeam() Team {
+	t := Team{Name: random(), Mascot: random()}
+	t.Save()
+	return t
+}

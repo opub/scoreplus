@@ -59,14 +59,19 @@ func Get(id int64, model interface{}) error {
 	return nil
 }
 
+//get models from data store if ids is empty then all rows returned
 func selectRows(ids []int64, table string) (*sqlx.Rows, error) {
 	db, err := db.Connect()
 	if err != nil {
 		return nil, err
 	}
 
-	sql := fmt.Sprintf("SELECT * FROM %s WHERE id = ANY($1)", table)
-	return db.Queryx(sql, pq.Array(ids))
+	if len(ids) > 0 {
+		sql := fmt.Sprintf("SELECT * FROM %s WHERE id = ANY($1)", table)
+		return db.Queryx(sql, pq.Array(ids))
+	}
+	sql := fmt.Sprintf("SELECT * FROM %s", table)
+	return db.Queryx(sql)
 }
 
 func (b *Base) execSQL(sql string, m interface{}) error {
