@@ -20,3 +20,23 @@ func (n *Note) Save() error {
 func (n *Note) Delete() error {
 	return n.delete("note")
 }
+
+//SelectNotes from data store where ID in slice
+func SelectNotes(ids []int64) ([]Note, error) {
+	rows, err := selectRows(ids, "note")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	slice := make([]Note, 0)
+	for rows.Next() {
+		n := Note{}
+		err = rows.StructScan(&n)
+		if err != nil {
+			return nil, err
+		}
+		slice = append(slice, n)
+	}
+	return slice, nil
+}

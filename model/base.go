@@ -7,6 +7,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
+
 	"github.com/guregu/null"
 	"github.com/opub/scoreplus/db"
 )
@@ -45,7 +48,7 @@ func Get(id int64, model interface{}) error {
 	}
 
 	table := strings.ToLower(reflect.TypeOf(model).Elem().Name())
-	sql := fmt.Sprintf("SELECT * FROM %s WHERE id=%d", table, id)
+	sql := fmt.Sprintf("SELECT * FROM %s WHERE id=%d LIMIT 1", table, id)
 
 	rows, err := db.Queryx(sql)
 	defer rows.Close()
@@ -56,10 +59,14 @@ func Get(id int64, model interface{}) error {
 	return nil
 }
 
-func createSlice(t reflect.Type) interface{} {
-	var sliceType reflect.Type
-	sliceType = reflect.SliceOf(t)
-	return reflect.Zero(sliceType).Interface()
+func selectRows(ids []int64, table string) (*sqlx.Rows, error) {
+	db, err := db.Connect()
+	if err != nil {
+		return nil, err
+	}
+
+	sql := fmt.Sprintf("SELECT * FROM %s WHERE id = ANY($1)", table)
+	return db.Queryx(sql, pq.Array(ids))
 }
 
 func (b *Base) execSQL(sql string, m interface{}) error {
@@ -101,10 +108,6 @@ func (b *Base) Scan(value interface{}) error {
 //Value implements the driver Valuer interface
 func (b Base) Value() (driver.Value, error) {
 	return b.ID, nil
-}
-
-func table(t reflect.Type) string {
-	return strings.ToLower(t.Name())
 }
 
 func nullTimeNow() null.Time {
