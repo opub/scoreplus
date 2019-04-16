@@ -23,8 +23,6 @@ func Connect() (*sqlx.DB, error) {
 	conn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		config.DB.Host, config.DB.Port, config.DB.Username, config.DB.Password, config.DB.Name)
 
-	fmt.Println("connection: ", conn, config.DB.Name)
-
 	db, err = sqlx.Open("postgres", conn)
 	if err != nil {
 		return db, err

@@ -1,6 +1,7 @@
 package model
 
 import (
+	"database/sql/driver"
 	"fmt"
 	"reflect"
 	"strings"
@@ -26,32 +27,40 @@ type Base struct {
 	ModifiedBy int64 `sql:" NOT NULL DEFAULT 0"`
 }
 
+//Delete removes object from data store
+func (b *Base) delete(table string) error {
+	sql := fmt.Sprintf("DELETE FROM %s WHERE id=:id", table)
+	fmt.Println(sql)
+	err := b.execSQL(sql, b)
+	if err == nil {
+		b.ID = 0
+	}
+	return err
+}
+
 //Get matching model from data store
-func Get(id int64, m interface{}) error {
+func Get(id int64, model interface{}) error {
 	db, err := db.Connect()
 	if err != nil {
 		return err
 	}
 
-	table := strings.ToLower(reflect.TypeOf(m).Elem().Name())
+	table := strings.ToLower(reflect.TypeOf(model).Elem().Name())
 	sql := fmt.Sprintf("SELECT * FROM %s WHERE id=%d", table, id)
 
-	fmt.Println(sql)
-
-	//	return db.Get(&m, sql)
-
 	rows, err := db.Queryx(sql)
+	defer rows.Close()
+
 	if rows.Next() {
-		err = rows.StructScan(m)
-		fmt.Printf("%#v\n", m)
-		return err
+		return rows.StructScan(model)
 	}
 	return nil
 }
 
-// NullTimeNow returns a time.Now() representation truncated to a microsecond to match database precision
-func NullTimeNow() null.Time {
-	return null.Time{Time: time.Now().Truncate(time.Microsecond), Valid: true}
+func createSlice(t reflect.Type) interface{} {
+	var sliceType reflect.Type
+	sliceType = reflect.SliceOf(t)
+	return reflect.Zero(sliceType).Interface()
 }
 
 func (b *Base) execSQL(sql string, m interface{}) error {
@@ -82,4 +91,23 @@ func (b *Base) execSQL(sql string, m interface{}) error {
 	}
 
 	return tx.Commit()
+}
+
+//Scan implements driver Scanner interface
+func (b *Base) Scan(value interface{}) error {
+	b.ID = value.(int64)
+	return nil
+}
+
+//Value implements the driver Valuer interface
+func (b Base) Value() (driver.Value, error) {
+	return b.ID, nil
+}
+
+func table(t reflect.Type) string {
+	return strings.ToLower(t.Name())
+}
+
+func nullTimeNow() null.Time {
+	return null.Time{Time: time.Now().Truncate(time.Microsecond), Valid: true}
 }
