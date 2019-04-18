@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"sync"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
@@ -13,6 +14,14 @@ import (
 type Config struct {
 	Salt string
 	DB   Database
+	Log  Log
+}
+
+//Log config settings
+type Log struct {
+	Level   string // debug, info, warn, error, fatal, panic, none
+	Console bool
+	Caller  bool
 }
 
 //Database config settings
@@ -24,19 +33,19 @@ type Database struct {
 	Password string
 }
 
-var config Config
-var testRE = regexp.MustCompile("_test|.test.exe$|(\\.test$)")
+var (
+	config     Config
+	onceConfig sync.Once
+	testRE     = regexp.MustCompile("_test|.test.exe$|(\\.test$)")
+)
 
 //GetConfig gets application configuration settings based on current environment
-func GetConfig() (Config, error) {
-	if config == (Config{}) {
-		var err error
-		config, err = loadConfig()
-		if err != nil {
-			return config, err
-		}
-	}
-	return config, nil
+func GetConfig() Config {
+	onceConfig.Do(func() {
+		setupConfig()
+		config = loadConfig()
+	})
+	return config
 }
 
 func getEnvironment() string {
@@ -49,7 +58,7 @@ func getEnvironment() string {
 	return "dev"
 }
 
-func loadConfig() (Config, error) {
+func setupConfig() {
 	env := getEnvironment()
 	viper.SetConfigName(env)
 	viper.SetConfigType("yaml")
@@ -58,16 +67,23 @@ func loadConfig() (Config, error) {
 
 	viper.WatchConfig()
 	viper.OnConfigChange(func(e fsnotify.Event) {
-		fmt.Println("config file changed: ", e.Name)
-		viper.Unmarshal(&config)
+		fmt.Printf("config settings changed in %s\n", e.Name)
+		config = loadConfig()
 	})
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		fmt.Printf("failed to read %s config: %s", env, err)
+		fmt.Printf("failed to read %s config: %s\n", env, err)
+		panic("config setup failed")
 	}
+}
 
+func loadConfig() Config {
 	settings := Config{}
-	viper.Unmarshal(&settings)
-	return settings, err
+	err := viper.Unmarshal(&settings)
+	if err != nil {
+		fmt.Printf("failed to unmarshal config: %s\n", err)
+		panic("config loading failed")
+	}
+	return settings
 }

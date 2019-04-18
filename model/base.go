@@ -12,6 +12,7 @@ import (
 
 	"github.com/guregu/null"
 	"github.com/opub/scoreplus/db"
+	"github.com/opub/scoreplus/log"
 )
 
 //Model data store operations
@@ -49,6 +50,9 @@ func Get(id int64, model interface{}) error {
 
 	table := strings.ToLower(reflect.TypeOf(model).Elem().Name())
 	sql := fmt.Sprintf("SELECT * FROM %s WHERE id=%d LIMIT 1", table, id)
+
+	log.Log.Info().Str("table", table).Int64("id", id).Msg("model.Get")
+	fmt.Println("LOGGING!")
 
 	rows, err := db.Queryx(sql)
 	defer rows.Close()

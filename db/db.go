@@ -15,15 +15,12 @@ func Connect() (*sqlx.DB, error) {
 
 	var db *sqlx.DB
 
-	config, err := util.GetConfig()
-	if err != nil {
-		return db, err
-	}
+	config := util.GetConfig()
 
 	conn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		config.DB.Host, config.DB.Port, config.DB.Username, config.DB.Password, config.DB.Name)
 
-	db, err = sqlx.Open("postgres", conn)
+	db, err := sqlx.Open("postgres", conn)
 	if err != nil {
 		return db, err
 	}

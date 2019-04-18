@@ -3,10 +3,7 @@ package util
 import "testing"
 
 func TestGetConfig(t *testing.T) {
-	config, err := GetConfig()
-	if err != nil {
-		t.Errorf("error in GetConfig: %s", err)
-	}
+	config := GetConfig()
 
 	if config.Salt != "imW$OcsNQwy7XtVld@p&Nr#0mkN&qN33$M5*4ZNzmYe%95e&qUdE0f7!Lr0mPMoI" {
 		t.Errorf("salt config not loaded")
