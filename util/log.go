@@ -1,23 +1,19 @@
-package log
+package util
 
 import (
 	"fmt"
 	"os"
 	"time"
 
-	"github.com/opub/scoreplus/util"
 	"github.com/rs/zerolog"
-	zlog "github.com/rs/zerolog/log"
+	"github.com/rs/zerolog/log"
 )
-
-//Log for global logging purposes
-var Log zerolog.Logger
 
 //InitLog initializes global logging settings
 func InitLog() {
-	config := util.GetConfig()
-	zerolog.TimeFieldFormat = time.RFC3339
+	config := GetConfig()
 
+	//set log level
 	if config.Log.Level == "none" || config.Log.Level == "disabled" {
 		zerolog.SetGlobalLevel(zerolog.Disabled)
 	} else {
@@ -29,16 +25,16 @@ func InitLog() {
 		zerolog.SetGlobalLevel(level)
 	}
 
-	Log = zerolog.New(os.Stderr).With().Timestamp().Logger()
-
+	//set log format
+	zerolog.TimeFieldFormat = time.RFC3339
+	logger := zerolog.New(os.Stderr).With().Timestamp().Logger()
 	if config.Log.Console {
-		Log = Log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339})
+		logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339})
 	}
 	if config.Log.Caller {
-		Log = Log.With().Caller().Logger()
+		logger = logger.With().Caller().Logger()
 	}
-
-	zlog.Logger = Log
+	log.Logger = logger
 }
 
 func init() {
