@@ -3,7 +3,7 @@ package model
 //Note data model
 type Note struct {
 	Base
-	Message string
+	Message string `json:"message,omitempty"`
 }
 
 //Save persists object to data store

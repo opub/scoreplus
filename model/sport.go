@@ -3,7 +3,7 @@ package model
 //Sport data model
 type Sport struct {
 	Base
-	Name string
+	Name string `json:"name,omitempty"`
 }
 
 //Save persists object to data store

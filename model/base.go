@@ -3,7 +3,6 @@ package model
 import (
 	"database/sql/driver"
 	"fmt"
-	"net/http"
 	"reflect"
 	"strings"
 	"time"
@@ -20,22 +19,16 @@ import (
 type Model interface {
 	Save() error
 	Delete() error
-	Render(w http.ResponseWriter, r *http.Request) error
 }
 
 //Base model that provides common fields
 type Base struct {
-	Model
-	ID         int64
-	Created    null.Time `sql:" NOT NULL DEFAULT now()"`
-	CreatedBy  int64     `sql:" NOT NULL DEFAULT 0"`
-	Modified   null.Time
-	ModifiedBy int64 `sql:" NOT NULL DEFAULT 0"`
-}
-
-//Render performs pre-processing before a response is marshalled and sent across the wire
-func (b *Base) Render(w http.ResponseWriter, r *http.Request) error {
-	return nil
+	Model      `json:"-"`
+	ID         int64     `json:"id,omitempty"`
+	Created    null.Time `sql:" NOT NULL DEFAULT now()" json:"created,omitempty"`
+	CreatedBy  int64     `sql:" NOT NULL DEFAULT 0" json:"createdby,omitempty"`
+	Modified   null.Time `json:"modified,omitempty"`
+	ModifiedBy int64     `sql:" NOT NULL DEFAULT 0" json:"modifiedby,omitempty"`
 }
 
 //Delete removes object from data store

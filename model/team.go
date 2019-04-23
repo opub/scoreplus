@@ -7,11 +7,11 @@ import (
 //Team data model
 type Team struct {
 	Base
-	Name   string
-	Sport  Sport
-	Venue  Venue
-	Mascot string
-	Games  pq.Int64Array
+	Name   string        `json:"name"`
+	Sport  Sport         `json:"sport,omitempty"`
+	Venue  Venue         `json:"venue,omitempty"`
+	Mascot string        `json:"mascot,omitempty"`
+	Games  pq.Int64Array `json:"games,omitempty"`
 }
 
 //Save persists object to data store

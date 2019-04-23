@@ -8,15 +8,15 @@ import (
 //Game data model
 type Game struct {
 	Base
-	Sport     Sport
-	HomeTeam  Team
-	AwayTeam  Team
-	HomeScore int
-	AwayScore int
-	Start     null.Time
-	Final     bool
-	Venue     Venue
-	Notes     pq.Int64Array
+	Sport     Sport         `json:"sport"`
+	HomeTeam  Team          `json:"hometeam"`
+	AwayTeam  Team          `json:"awayteam"`
+	HomeScore int           `json:"homescore"`
+	AwayScore int           `json:"awayscore"`
+	Start     null.Time     `json:"start,omitempty"`
+	Final     bool          `json:"final"`
+	Venue     Venue         `json:"venue,omitempty"`
+	Notes     pq.Int64Array `json:"notes,omitempty"`
 }
 
 //Save persists object to data store

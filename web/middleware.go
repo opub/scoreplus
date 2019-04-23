@@ -3,6 +3,7 @@ package web
 import (
 	"context"
 	"net/http"
+	"runtime/debug"
 	"time"
 
 	"github.com/go-chi/chi/middleware"
@@ -44,6 +45,7 @@ func Recoverer(next http.Handler) http.Handler {
 				}
 
 				log.Error().Stack().Err(errors.Wrap(err, "unexpected error")).Msg("unexpected error")
+				debug.PrintStack()
 				render.Render(w, r, ErrServerError(err))
 			}
 		}()

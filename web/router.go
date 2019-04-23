@@ -81,21 +81,21 @@ func GameCtx(next http.Handler) http.Handler {
 			render.Render(w, r, ErrNotFound)
 			return
 		}
-		ctx := context.WithValue(r.Context(), modelKey, game)
+		ctx := context.WithValue(r.Context(), modelKey, &game)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 
 func getModel(w http.ResponseWriter, r *http.Request) {
-	m := r.Context().Value(modelKey).(*model.Base)
-	render.Render(w, r, m)
+	m := r.Context().Value(modelKey).(model.Model)
+	render.Render(w, r, NewModelResponse(m))
 }
 
 func deleteModel(w http.ResponseWriter, r *http.Request) {
-	m := r.Context().Value(modelKey).(*model.Base)
+	m := r.Context().Value(modelKey).(model.Model)
 	err := m.Delete()
 	if err != nil {
-		log.Warn().Int64("id", m.ID).Msg("delete failed")
+		log.Warn().Msg("delete failed")
 		render.Render(w, r, ErrServerError(err))
 		return
 	}
@@ -110,4 +110,16 @@ func paginate(next http.Handler) http.Handler {
 		// the page number, or the limit, and send a query cursor down the chain
 		next.ServeHTTP(w, r)
 	})
+}
+
+type ModelResponse struct {
+	Results model.Model `json:"results"`
+}
+
+func NewModelResponse(m model.Model) *ModelResponse {
+	return &ModelResponse{Results: m}
+}
+
+func (mr *ModelResponse) Render(w http.ResponseWriter, r *http.Request) error {
+	return nil
 }

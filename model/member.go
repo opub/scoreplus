@@ -8,16 +8,16 @@ import (
 //Member data model
 type Member struct {
 	Base
-	Handle     string `sql:" NOT NULL UNIQUE"`
-	Email      string `sql:" NOT NULL UNIQUE"`
-	FirstName  string
-	LastName   string
-	Verified   bool
-	Enabled    bool
-	LastActive null.Time
-	Teams      pq.Int64Array
-	Follows    pq.Int64Array
-	Followers  pq.Int64Array
+	Handle     string        `sql:" NOT NULL UNIQUE"`
+	Email      string        `sql:" NOT NULL UNIQUE"`
+	FirstName  string        `json:"firstname"`
+	LastName   string        `json:"lastname"`
+	Verified   bool          `json:"-"`
+	Enabled    bool          `json:"-"`
+	LastActive null.Time     `json:"-"`
+	Teams      pq.Int64Array `json:"teams,omitempty"`
+	Follows    pq.Int64Array `json:"follows,omitempty"`
+	Followers  pq.Int64Array `json:"followers,omitempty"`
 }
 
 //Save persists object to data store
