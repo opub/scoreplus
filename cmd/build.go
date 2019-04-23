@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"fmt"
@@ -6,10 +6,16 @@ import (
 	"strings"
 
 	"github.com/opub/scoreplus/model"
+	"github.com/spf13/cobra"
 )
 
-func main() {
-	buildSchemaSQL()
+var buildCmd = &cobra.Command{
+	Use:   "build",
+	Short: "Generates application build artifacts.",
+	Long:  "Generates SQL scripts that are used to create a new database schema for the application model storage.",
+	Run: func(cmd *cobra.Command, args []string) {
+		buildSchemaSQL()
+	},
 }
 
 var models = []interface{}{model.Game{}, model.Member{}, model.Note{}, model.Sport{}, model.Team{}, model.Venue{}}

@@ -3,6 +3,7 @@ package model
 import (
 	"database/sql/driver"
 	"fmt"
+	"net/http"
 	"reflect"
 	"strings"
 	"time"
@@ -19,6 +20,7 @@ import (
 type Model interface {
 	Save() error
 	Delete() error
+	Render(w http.ResponseWriter, r *http.Request) error
 }
 
 //Base model that provides common fields
@@ -29,6 +31,11 @@ type Base struct {
 	CreatedBy  int64     `sql:" NOT NULL DEFAULT 0"`
 	Modified   null.Time
 	ModifiedBy int64 `sql:" NOT NULL DEFAULT 0"`
+}
+
+//Render performs pre-processing before a response is marshalled and sent across the wire
+func (b *Base) Render(w http.ResponseWriter, r *http.Request) error {
+	return nil
 }
 
 //Delete removes object from data store
@@ -52,7 +59,6 @@ func Get(id int64, model interface{}) error {
 	sql := fmt.Sprintf("SELECT * FROM %s WHERE id=%d LIMIT 1", table, id)
 
 	log.Info().Str("table", table).Int64("id", id).Msg("model.Get")
-	fmt.Println("LOGGING!")
 
 	rows, err := db.Queryx(sql)
 	defer rows.Close()

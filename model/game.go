@@ -58,3 +58,9 @@ func SelectGames(ids []int64) ([]Game, error) {
 func SelectAllGames() ([]Game, error) {
 	return SelectGames(nil)
 }
+
+func GetGame(id int64) (Game, error) {
+	g := Game{}
+	err := Get(id, &g)
+	return g, err
+}
