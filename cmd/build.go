@@ -30,17 +30,19 @@ func buildSchemaSQL() {
 func buildTableSQL(t reflect.Type) {
 	table := strings.ToLower(t.Name())
 	fmt.Printf("-- %s\n\nDROP TABLE IF EXISTS %s CASCADE;\nCREATE TABLE %s\n(\n", table, table, table)
-
+	first := true
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 		if field.Type.String() == "model.Base" {
 			for j := 0; j < field.Type.NumField(); j++ {
 				if field.Type.Field(j).Type.Name() != "Model" {
-					buildColumnSQL(field.Type.Field(j), i == t.NumField()-1 && j == field.Type.NumField()-1)
+					buildColumnSQL(field.Type.Field(j), first)
+					first = false
 				}
 			}
 		} else {
-			buildColumnSQL(field, i == t.NumField()-1)
+			buildColumnSQL(field, first)
+			first = false
 		}
 	}
 
@@ -49,7 +51,12 @@ func buildTableSQL(t reflect.Type) {
 	fmt.Printf("GRANT SELECT, USAGE ON SEQUENCE %s_id_seq TO scoreplus_writer;\nGRANT SELECT ON SEQUENCE %s_id_seq TO scoreplus_reader;\n\n", table, table)
 }
 
-func buildColumnSQL(f reflect.StructField, last bool) {
+func buildColumnSQL(f reflect.StructField, first bool) {
+	tag := f.Tag.Get("sql")
+	if tag == "-" {
+		return
+	}
+
 	name := strings.ToLower(f.Name)
 	gotype := f.Type.Name()
 	ctype := gotype
@@ -72,17 +79,18 @@ func buildColumnSQL(f reflect.StructField, last bool) {
 		ctype = "integer NOT NULL DEFAULT 0"
 	}
 
+	if !first {
+		fmt.Print("\t, ")
+	} else {
+		fmt.Print("\t")
+	}
 	//couple special cases
 	if name == "id" && gotype == "int64" {
-		fmt.Printf("\t%s serial PRIMARY KEY", name)
+		fmt.Printf("%s serial PRIMARY KEY", name)
 	} else if name == "email" && gotype == "string" {
-		fmt.Printf("\t%s email", name)
+		fmt.Printf("%s email", name)
 	} else {
-		fmt.Printf("\t%s %s", name, ctype)
+		fmt.Printf("%s %s", name, ctype)
 	}
-	fmt.Printf("%v", f.Tag.Get("sql"))
-	if !last {
-		fmt.Print(",")
-	}
-	fmt.Println()
+	fmt.Printf("%s\n", tag)
 }

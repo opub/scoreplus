@@ -41,8 +41,8 @@ func (b *Base) delete(table string) error {
 	return err
 }
 
-//Get matching model from data store
-func Get(id int64, model interface{}) error {
+//get matching model from data store
+func get(id int64, model interface{}) error {
 	db, err := db.Connect()
 	if err != nil {
 		return err
@@ -51,7 +51,7 @@ func Get(id int64, model interface{}) error {
 	table := strings.ToLower(reflect.TypeOf(model).Elem().Name())
 	sql := fmt.Sprintf("SELECT * FROM %s WHERE id=%d LIMIT 1", table, id)
 
-	log.Info().Str("table", table).Int64("id", id).Msg("model.Get")
+	log.Info().Str("table", table).Int64("id", id).Msg("model.get")
 
 	rows, err := db.Queryx(sql)
 	defer rows.Close()

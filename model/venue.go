@@ -47,3 +47,10 @@ func SelectVenues(ids []int64) ([]Venue, error) {
 func SelectAllVenues() ([]Venue, error) {
 	return SelectVenues(nil)
 }
+
+//GetVenue returns venue from data store
+func GetVenue(id int64) (Venue, error) {
+	v := Venue{}
+	err := get(id, &v)
+	return v, err
+}

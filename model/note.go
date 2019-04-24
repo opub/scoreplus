@@ -45,3 +45,10 @@ func SelectNotes(ids []int64) ([]Note, error) {
 func SelectAllNotes() ([]Note, error) {
 	return SelectNotes(nil)
 }
+
+//GetNote returns note from data store
+func GetNote(id int64) (Note, error) {
+	n := Note{}
+	err := get(id, &n)
+	return n, err
+}

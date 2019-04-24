@@ -16,11 +16,13 @@ type Game struct {
 	Start     null.Time     `json:"start,omitempty"`
 	Final     bool          `json:"final"`
 	Venue     Venue         `json:"venue,omitempty"`
-	Notes     pq.Int64Array `json:"notes,omitempty"`
+	Notes     pq.Int64Array `json:"-"`
+	NoteCount int           `sql:"-" json:"notecount"`
 }
 
 //Save persists object to data store
 func (g *Game) Save() error {
+	g.setup()
 	if g.ID == 0 {
 		g.Created = nullTimeNow()
 		return g.execSQL("INSERT INTO game (sport, hometeam, awayteam, homescore, awayscore, start, final, venue, notes, created, createdby) VALUES (:sport, :hometeam, :awayteam, :homescore, :awayscore, :start, :final, :venue, :notes, :created, :createdby) RETURNING id", g)
@@ -49,6 +51,7 @@ func SelectGames(ids []int64) ([]Game, error) {
 		if err != nil {
 			return nil, err
 		}
+		g.setup()
 		results = append(results, g)
 	}
 	return results, nil
@@ -59,8 +62,14 @@ func SelectAllGames() ([]Game, error) {
 	return SelectGames(nil)
 }
 
+//GetGame returns game from data store
 func GetGame(id int64) (Game, error) {
 	g := Game{}
-	err := Get(id, &g)
+	err := get(id, &g)
+	g.setup()
 	return g, err
+}
+
+func (g *Game) setup() {
+	g.NoteCount = len(g.Notes)
 }

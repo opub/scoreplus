@@ -22,8 +22,7 @@ func TestVenueCRUD(t *testing.T) {
 
 	//read
 	id := m1.ID
-	m2 := Venue{}
-	err = Get(id, &m2)
+	m2, err := GetVenue(id)
 	if err != nil {
 		t.Errorf("select failed: %v", err)
 	}

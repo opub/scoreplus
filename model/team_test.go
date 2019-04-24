@@ -22,8 +22,7 @@ func TestTeamCRUD(t *testing.T) {
 
 	//read
 	id := m1.ID
-	m2 := Team{}
-	err = Get(id, &m2)
+	m2, err := GetTeam(id)
 	if err != nil {
 		t.Errorf("select failed: %v", err)
 	}

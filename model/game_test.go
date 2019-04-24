@@ -30,8 +30,7 @@ func TestGameCRUD(t *testing.T) {
 
 	//read
 	id := m1.ID
-	m2 := Game{}
-	err = Get(id, &m2)
+	m2, err := GetGame(id)
 	if err != nil {
 		t.Errorf("select failed: %v", err)
 	}

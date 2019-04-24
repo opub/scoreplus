@@ -24,8 +24,7 @@ func TestMemberCRUD(t *testing.T) {
 
 	//read
 	id := m1.ID
-	m2 := Member{}
-	err = Get(id, &m2)
+	m2, err := GetMember(id)
 	if err != nil {
 		t.Errorf("select failed: %v", err)
 	}

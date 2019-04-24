@@ -45,3 +45,10 @@ func SelectSports(ids []int64) ([]Sport, error) {
 func SelectAllSports() ([]Sport, error) {
 	return SelectSports(nil)
 }
+
+//GetSport returns sport from data store
+func GetSport(id int64) (Sport, error) {
+	s := Sport{}
+	err := get(id, &s)
+	return s, err
+}

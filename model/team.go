@@ -7,15 +7,17 @@ import (
 //Team data model
 type Team struct {
 	Base
-	Name   string        `json:"name"`
-	Sport  Sport         `json:"sport,omitempty"`
-	Venue  Venue         `json:"venue,omitempty"`
-	Mascot string        `json:"mascot,omitempty"`
-	Games  pq.Int64Array `json:"games,omitempty"`
+	Name      string        `json:"name"`
+	Sport     Sport         `json:"sport,omitempty"`
+	Venue     Venue         `json:"venue,omitempty"`
+	Mascot    string        `json:"mascot,omitempty"`
+	Games     pq.Int64Array `json:"-"`
+	GameCount int           `sql:"-" json:"gameCount"`
 }
 
 //Save persists object to data store
 func (t *Team) Save() error {
+	t.setup()
 	if t.ID == 0 {
 		t.Created = nullTimeNow()
 		return t.execSQL("INSERT INTO team (name, sport, venue, mascot, games, created, createdby) VALUES (:name, :sport, :venue, :mascot, :games, :created, :createdby) RETURNING id", t)
@@ -44,6 +46,7 @@ func SelectTeams(ids []int64) ([]Team, error) {
 		if err != nil {
 			return nil, err
 		}
+		t.setup()
 		results = append(results, t)
 	}
 	return results, nil
@@ -52,4 +55,16 @@ func SelectTeams(ids []int64) ([]Team, error) {
 //SelectAllTeams from data store
 func SelectAllTeams() ([]Team, error) {
 	return SelectTeams(nil)
+}
+
+//GetTeam returns team from data store
+func GetTeam(id int64) (Team, error) {
+	t := Team{}
+	err := get(id, &t)
+	t.setup()
+	return t, err
+}
+
+func (t *Team) setup() {
+	t.GameCount = len(t.Games)
 }

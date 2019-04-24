@@ -8,20 +8,24 @@ import (
 //Member data model
 type Member struct {
 	Base
-	Handle     string        `sql:" NOT NULL UNIQUE"`
-	Email      string        `sql:" NOT NULL UNIQUE"`
-	FirstName  string        `json:"firstname"`
-	LastName   string        `json:"lastname"`
-	Verified   bool          `json:"-"`
-	Enabled    bool          `json:"-"`
-	LastActive null.Time     `json:"-"`
-	Teams      pq.Int64Array `json:"teams,omitempty"`
-	Follows    pq.Int64Array `json:"follows,omitempty"`
-	Followers  pq.Int64Array `json:"followers,omitempty"`
+	Handle        string        `sql:" NOT NULL UNIQUE"`
+	Email         string        `sql:" NOT NULL UNIQUE"`
+	FirstName     string        `json:"firstname"`
+	LastName      string        `json:"lastname"`
+	Verified      bool          `json:"-"`
+	Enabled       bool          `json:"-"`
+	LastActive    null.Time     `json:"-"`
+	Teams         pq.Int64Array `json:"-"`
+	TeamCount     int           `sql:"-" json:"teamCount"`
+	Follows       pq.Int64Array `json:"-"`
+	FollowCount   int           `sql:"-" json:"followCount"`
+	Followers     pq.Int64Array `json:"-"`
+	FollowerCount int           `sql:"-" json:"followerCount"`
 }
 
 //Save persists object to data store
 func (m *Member) Save() error {
+	m.setup()
 	if m.ID == 0 {
 		m.Created = nullTimeNow()
 		return m.execSQL("INSERT INTO member (handle, email, firstname, lastname, verified, enabled, lastactive, teams, follows, followers, created, createdby) VALUES (:handle, :email, :firstname, :lastname, :verified, :enabled, :lastactive, :teams, :follows, :followers, :created, :createdby) RETURNING id", m)
@@ -58,4 +62,18 @@ func SelectMembers(ids []int64) ([]Member, error) {
 //SelectAllMembers from data store
 func SelectAllMembers() ([]Member, error) {
 	return SelectMembers(nil)
+}
+
+//GetMember returns member from data store
+func GetMember(id int64) (Member, error) {
+	m := Member{}
+	err := get(id, &m)
+	m.setup()
+	return m, err
+}
+
+func (m *Member) setup() {
+	m.TeamCount = len(m.Teams)
+	m.FollowCount = len(m.Follows)
+	m.FollowerCount = len(m.Followers)
 }

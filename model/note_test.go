@@ -23,8 +23,7 @@ func TestNoteCRUD(t *testing.T) {
 
 	//read
 	id := m1.ID
-	m2 := Note{}
-	err = Get(id, &m2)
+	m2, err := GetNote(id)
 	if err != nil {
 		t.Errorf("select failed: %v", err)
 	}
