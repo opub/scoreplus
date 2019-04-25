@@ -11,3 +11,7 @@ log:
   level: debug
   console: true
   caller: true
+
+path:
+  staticfiles: "resources/"
+  templates: "web/templates/"

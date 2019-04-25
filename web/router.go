@@ -3,7 +3,10 @@ package web
 import (
 	"context"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/opub/scoreplus/model"
@@ -28,7 +31,8 @@ func Start() {
 	r.Use(middleware.RealIP)
 	r.Use(Logger)
 	r.Use(Recoverer)
-	r.Use(render.SetContentType(render.ContentTypeJSON))
+	r.Use(middleware.StripSlashes)
+	r.Use(render.SetContentType(render.ContentTypeHTML))
 
 	// Set a timeout value on the request context (ctx), that will signal
 	// through ctx.Done() that the request has timed out and further
@@ -36,11 +40,20 @@ func Start() {
 	r.Use(middleware.Timeout(60 * time.Second))
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("hi"))
+		templateHandler("home", w, r)
 	})
 
-	// RESTy routes for "articles" resource
+	r.Get("/home", func(w http.ResponseWriter, r *http.Request) {
+		templateHandler("home", w, r)
+	})
+
+	r.Get("/privacy", func(w http.ResponseWriter, r *http.Request) {
+		templateHandler("privacy", w, r)
+	})
+
 	r.Route("/game", func(r chi.Router) {
+		r.Use(render.SetContentType(render.ContentTypeJSON))
+
 		// r.With(paginate).Get("/", listGames) // GET /game
 		// r.Post("/", createGame)              // POST /game
 
@@ -53,11 +66,45 @@ func Start() {
 		})
 	})
 
-	// Mount the admin sub-router
-	// r.Mount("/admin", adminRouter())
+	config := util.GetConfig()
+	wd, _ := os.Getwd()
+	filesDir := filepath.Join(wd, config.Path.StaticFiles)
+	fileServer(r, "/static", http.Dir(filesDir))
 
 	log.Info().Str("version", util.Version).Msg("starting server")
 	http.ListenAndServe(":8080", r)
+}
+
+func templateHandler(name string, w http.ResponseWriter, r *http.Request) {
+	log.Debug().Str("template", name).Msg("starting handler")
+	t := Templates[name]
+	err := t.Execute(w, "")
+	if err != nil {
+		log.Error().Str("template", name).Msg("could not execute template")
+		render.Render(w, r, ErrServerError(err))
+		return
+	}
+	log.Debug().Str("template", name).Msg("completed handler")
+}
+
+// fileServer sets up a http.FileServer handler to serve
+// static files from a http.FileSystem.
+func fileServer(r chi.Router, path string, root http.FileSystem) {
+	if strings.ContainsAny(path, "{}*") {
+		panic("FileServer does not permit URL parameters.")
+	}
+
+	fs := http.StripPrefix(path, http.FileServer(root))
+
+	if path != "/" && path[len(path)-1] != '/' {
+		r.Get(path, http.RedirectHandler(path+"/", 301).ServeHTTP)
+		path += "/"
+	}
+	path += "*"
+
+	r.Get(path, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fs.ServeHTTP(w, r)
+	}))
 }
 
 //GameCtx adds requested Game to Context
@@ -102,24 +149,19 @@ func deleteModel(w http.ResponseWriter, r *http.Request) {
 	render.Render(w, r, StatusOK)
 }
 
-// paginate is a stub, but very possible to implement middleware logic
-// to handle the request params for handling a paginated request.
-func paginate(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// just a stub.. some ideas are to look at URL query params for something like
-		// the page number, or the limit, and send a query cursor down the chain
-		next.ServeHTTP(w, r)
-	})
-}
+// wrapper methods for
 
+//ModelResponse result wrapper
 type ModelResponse struct {
 	Results model.Model `json:"results"`
 }
 
+//NewModelResponse creates new wrapped ModelResponse
 func NewModelResponse(m model.Model) *ModelResponse {
 	return &ModelResponse{Results: m}
 }
 
+//Render interface for JSON rendering
 func (mr *ModelResponse) Render(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }

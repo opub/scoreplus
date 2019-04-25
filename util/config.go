@@ -15,6 +15,13 @@ type Config struct {
 	Salt string
 	DB   Database
 	Log  Log
+	Path Path
+}
+
+//Path config settings
+type Path struct {
+	StaticFiles string
+	Templates   string
 }
 
 //Log config settings
