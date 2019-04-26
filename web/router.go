@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/markbates/goth/gothic"
 	"github.com/opub/scoreplus/model"
 	"github.com/opub/scoreplus/util"
 	"github.com/rs/zerolog/log"
@@ -18,9 +19,14 @@ import (
 	"github.com/go-chi/render"
 )
 
-type modelContextKey struct{}
+// contextKey is a value for use with context.WithValue. It's used as
+// a pointer so it fits in an interface{} without allocation. This technique
+// for defining context keys was copied from Go 1.7's new use of context in net/http.
+type contextKey struct {
+	name string
+}
 
-var modelKey = modelContextKey{}
+var modelKey = &contextKey{"Model"}
 
 //Start launches web server
 func Start() {
@@ -40,15 +46,15 @@ func Start() {
 	r.Use(middleware.Timeout(60 * time.Second))
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		templateHandler("home", w, r)
+		templateHandler("home", providerIndex, w, r)
 	})
 
 	r.Get("/home", func(w http.ResponseWriter, r *http.Request) {
-		templateHandler("home", w, r)
+		templateHandler("home", providerIndex, w, r)
 	})
 
 	r.Get("/privacy", func(w http.ResponseWriter, r *http.Request) {
-		templateHandler("privacy", w, r)
+		templateHandler("privacy", "", w, r)
 	})
 
 	r.Route("/game", func(r chi.Router) {
@@ -66,19 +72,58 @@ func Start() {
 		})
 	})
 
+	r.Route("/auth", func(r chi.Router) {
+		r.Use(ProviderCtx)
+
+		//logout
+		r.Get("/logout", func(w http.ResponseWriter, r *http.Request) {
+			gothic.Logout(w, r)
+			w.Header().Set("Location", "/")
+			w.WriteHeader(http.StatusTemporaryRedirect)
+		})
+
+		//start authentication
+		r.Get("/{provider}", func(w http.ResponseWriter, r *http.Request) {
+			// try to get the user without re-authenticating
+			if user, err := gothic.CompleteUserAuth(w, r); err == nil {
+				log.Info().Str("email", user.Email).Msg("user authenticated already")
+				templateHandler("home", "", w, r)
+			} else {
+				gothic.BeginAuthHandler(w, r)
+			}
+		})
+
+		//continue authentication
+		r.Get("/{provider}/callback", func(w http.ResponseWriter, r *http.Request) {
+			user, err := gothic.CompleteUserAuth(w, r)
+			if err != nil {
+				log.Error().Err(err).Msg("user authentication failed")
+				render.Render(w, r, ErrServerError(err))
+				return
+			}
+			log.Info().Str("email", user.Email).Msg("user authenticated")
+			templateHandler("home", "", w, r)
+		})
+	})
+
 	config := util.GetConfig()
 	wd, _ := os.Getwd()
 	filesDir := filepath.Join(wd, config.Path.StaticFiles)
 	fileServer(r, "/static", http.Dir(filesDir))
 
+	r.Get("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+		fs := http.FileServer(http.Dir(filesDir))
+		fs.ServeHTTP(w, r)
+	})
+
 	log.Info().Str("version", util.Version).Msg("starting server")
 	http.ListenAndServe(":8080", r)
 }
 
-func templateHandler(name string, w http.ResponseWriter, r *http.Request) {
+func templateHandler(name string, data interface{}, w http.ResponseWriter, r *http.Request) {
 	log.Debug().Str("template", name).Msg("starting handler")
 	t := Templates[name]
-	err := t.Execute(w, "")
+	err := t.Execute(w, data)
 	if err != nil {
 		log.Error().Str("template", name).Msg("could not execute template")
 		render.Render(w, r, ErrServerError(err))
