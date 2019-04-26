@@ -16,6 +16,14 @@ type Config struct {
 	DB   Database
 	Log  Log
 	Path Path
+	Auth Auth
+}
+
+//Auth config settings
+type Auth struct {
+	SessionSecret string
+	Callback      string
+	Secure        bool
 }
 
 //Path config settings
@@ -53,6 +61,12 @@ func GetConfig() Config {
 		config = loadConfig()
 	})
 	return config
+}
+
+//GetConfigString gets application setting for provided key value
+func GetConfigString(key string) string {
+	GetConfig()
+	return viper.GetString(key)
 }
 
 func getEnvironment() string {

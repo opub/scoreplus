@@ -2,65 +2,51 @@ package web
 
 import (
 	"context"
+	"fmt"
 	"net/http"
-	"os"
-	"sort"
+	"strings"
 
 	"github.com/go-chi/chi"
+	"github.com/gorilla/sessions"
 	"github.com/markbates/goth/gothic"
+	"github.com/opub/scoreplus/util"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/providers/amazon"
 	"github.com/markbates/goth/providers/facebook"
 	"github.com/markbates/goth/providers/google"
 	"github.com/markbates/goth/providers/instagram"
-	"github.com/markbates/goth/providers/microsoftonline"
+	microsoft "github.com/markbates/goth/providers/microsoftonline"
 	"github.com/markbates/goth/providers/twitter"
 	"github.com/markbates/goth/providers/yahoo"
 )
 
 //ProviderIndex of supported providers
 type ProviderIndex struct {
-	Providers    []string
-	ProvidersMap map[string]string
+	Keys []string
+	Map  map[string]string
 }
 
-var providerIndex *ProviderIndex
+var providers = &ProviderIndex{Keys: []string{"amazon", "facebook", "google", "instagram", "microsoft", "twitter", "yahoo"}, Map: make(map[string]string)}
 
 var providerKey = &contextKey{"Provider"}
 
 func init() {
-	goth.UseProviders(
-		//TODO set keys secrets and URLs
-		amazon.New(os.Getenv("AMAZON_KEY"), os.Getenv("AMAZON_SECRET"), "http://localhost:3000/auth/amazon/callback"),
-		facebook.New(os.Getenv("FACEBOOK_KEY"), os.Getenv("FACEBOOK_SECRET"), "http://localhost:3000/auth/facebook/callback"),
-		google.New(os.Getenv("GOOGLE_KEY"), os.Getenv("GOOGLE_SECRET"), "http://localhost:3000/auth/google/callback"),
-		instagram.New(os.Getenv("INSTAGRAM_KEY"), os.Getenv("INSTAGRAM_SECRET"), "http://localhost:3000/auth/instagram/callback"),
-		microsoftonline.New(os.Getenv("MICROSOFT_KEY"), os.Getenv("MICROSOFT_SECRET"), "http://localhost:3000/auth/microsoft/callback"),
-		twitter.New(os.Getenv("TWITTER_KEY"), os.Getenv("TWITTER_SECRET"), "http://localhost:3000/auth/twitter/callback"),
-
-		//Pointed localhost.com to http://localhost:3000/auth/yahoo/callback through proxy as yahoo
-		// does not allow to put custom ports in redirection uri
-		yahoo.New(os.Getenv("YAHOO_KEY"), os.Getenv("YAHOO_SECRET"), "http://localhost.com"),
-	)
-
-	m := make(map[string]string)
-	m["amazon"] = "Amazon"
-	m["facebook"] = "Facebook"
-	m["google"] = "Google"
-	m["instagram"] = "Instagram"
-	m["microsoft"] = "Microsoft"
-	m["twitter"] = "Twitter"
-	m["yahoo"] = "Yahoo"
-
-	var keys []string
-	for k := range m {
-		keys = append(keys, k)
+	for _, p := range providers.Keys {
+		registerProvider(p)
 	}
-	sort.Strings(keys)
 
-	providerIndex = &ProviderIndex{Providers: keys, ProvidersMap: m}
+	config := util.GetConfig().Auth
+
+	store := sessions.NewCookieStore([]byte(config.SessionSecret))
+	store.MaxAge(86400 * 30) // 30 days
+	store.Options.Path = "/"
+	store.Options.HttpOnly = true // HttpOnly should always be enabled
+	store.Options.Secure = config.Secure
+
+	gothic.Store = store
 
 	gothic.GetProviderName = getProviderName
 }
@@ -69,7 +55,7 @@ func init() {
 func ProviderCtx(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		p := chi.URLParam(r, "provider")
-		ctx := context.WithValue(r.Context(), providerKey, &p)
+		ctx := context.WithValue(r.Context(), providerKey, p)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -78,5 +64,38 @@ func getProviderName(r *http.Request) (string, error) {
 	if p, ok := r.Context().Value(providerKey).(string); ok {
 		return p, nil
 	}
-	return "", errors.New("you must select a provider")
+	return "", errors.New("provider not configured")
+}
+
+func registerProvider(name string) {
+	client := util.GetConfigString("auth." + name + ".key")
+	secret := util.GetConfigString("auth." + name + ".secret")
+	callback := fmt.Sprintf(util.GetConfigString("auth.callback"), name)
+
+	//TODO Yahoo does not allow custom ports in redirection uri
+
+	providers.Map[name] = strings.Title(name)
+
+	var p goth.Provider
+	switch name {
+	case "amazon":
+		p = amazon.New(client, secret, callback)
+	case "facebook":
+		p = facebook.New(client, secret, callback)
+	case "google":
+		p = google.New(client, secret, callback,
+			"https://www.googleapis.com/auth/userinfo.profile",
+			"https://www.googleapis.com/auth/userinfo.email")
+	case "instagram":
+		p = instagram.New(client, secret, callback)
+	case "microsoft":
+		p = microsoft.New(client, secret, callback)
+	case "twitter":
+		p = twitter.New(client, secret, callback)
+	case "yahoo":
+		p = yahoo.New(client, secret, callback)
+	default:
+		log.Fatal().Str("name", name).Msg("unsupported provider")
+	}
+	goth.UseProviders(p)
 }

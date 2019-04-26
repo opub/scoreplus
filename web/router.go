@@ -2,6 +2,7 @@ package web
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -46,11 +47,11 @@ func Start() {
 	r.Use(middleware.Timeout(60 * time.Second))
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		templateHandler("home", providerIndex, w, r)
+		templateHandler("home", providers, w, r)
 	})
 
 	r.Get("/home", func(w http.ResponseWriter, r *http.Request) {
-		templateHandler("home", providerIndex, w, r)
+		templateHandler("home", providers, w, r)
 	})
 
 	r.Get("/privacy", func(w http.ResponseWriter, r *http.Request) {
@@ -73,36 +74,46 @@ func Start() {
 	})
 
 	r.Route("/auth", func(r chi.Router) {
-		r.Use(ProviderCtx)
 
 		//logout
 		r.Get("/logout", func(w http.ResponseWriter, r *http.Request) {
+			log.Debug().Msg("routing auth logout")
 			gothic.Logout(w, r)
 			w.Header().Set("Location", "/")
 			w.WriteHeader(http.StatusTemporaryRedirect)
 		})
 
-		//start authentication
-		r.Get("/{provider}", func(w http.ResponseWriter, r *http.Request) {
-			// try to get the user without re-authenticating
-			if user, err := gothic.CompleteUserAuth(w, r); err == nil {
-				log.Info().Str("email", user.Email).Msg("user authenticated already")
-				templateHandler("home", "", w, r)
-			} else {
-				gothic.BeginAuthHandler(w, r)
-			}
-		})
+		r.Route("/{provider}", func(r chi.Router) {
+			r.Use(ProviderCtx)
 
-		//continue authentication
-		r.Get("/{provider}/callback", func(w http.ResponseWriter, r *http.Request) {
-			user, err := gothic.CompleteUserAuth(w, r)
-			if err != nil {
-				log.Error().Err(err).Msg("user authentication failed")
-				render.Render(w, r, ErrServerError(err))
-				return
-			}
-			log.Info().Str("email", user.Email).Msg("user authenticated")
-			templateHandler("home", "", w, r)
+			//start authentication
+			r.Get("/login", func(w http.ResponseWriter, r *http.Request) {
+				// try to get the user without re-authenticating
+				log.Debug().Msg("routing auth start")
+				if user, err := gothic.CompleteUserAuth(w, r); err == nil {
+					fmt.Printf("\nUSER1: %+v\n", user)
+					log.Info().Str("email", user.Email).Msg("user authenticated already")
+					w.Header().Set("Location", "/")
+					w.WriteHeader(http.StatusTemporaryRedirect)
+				} else {
+					gothic.BeginAuthHandler(w, r)
+				}
+			})
+
+			//continue authentication
+			r.Get("/callback", func(w http.ResponseWriter, r *http.Request) {
+				log.Debug().Msg("routing auth callback")
+				user, err := gothic.CompleteUserAuth(w, r)
+				if err != nil {
+					log.Error().Err(err).Msg("user authentication failed")
+					render.Render(w, r, ErrServerError(err))
+					return
+				}
+				fmt.Printf("\nUSER2: %+v\n", user)
+				log.Info().Str("email", user.Email).Msg("user authenticated")
+				w.Header().Set("Location", "/")
+				w.WriteHeader(http.StatusTemporaryRedirect)
+			})
 		})
 	})
 
