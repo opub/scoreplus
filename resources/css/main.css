@@ -23,6 +23,10 @@ content {
   text-decoration: none
 }
 
+.fa-facebook:hover {
+    color: rgb(66, 103, 178)
+}
+
 .fa-google:hover {
     color: rgb(66, 133, 244)
 }

@@ -91,7 +91,7 @@ func Start() {
 				// try to get the user without re-authenticating
 				log.Debug().Msg("routing auth start")
 				if user, err := gothic.CompleteUserAuth(w, r); err == nil {
-					fmt.Printf("\nUSER1: %+v\n", user)
+					fmt.Printf("\nUSER1:\n%+v\n\n", user)
 					log.Info().Str("email", user.Email).Msg("user authenticated already")
 					w.Header().Set("Location", "/")
 					w.WriteHeader(http.StatusTemporaryRedirect)
@@ -109,7 +109,7 @@ func Start() {
 					render.Render(w, r, ErrServerError(err))
 					return
 				}
-				fmt.Printf("\nUSER2: %+v\n", user)
+				fmt.Printf("\nUSER2:\n%+v\n\n", user)
 				log.Info().Str("email", user.Email).Msg("user authenticated")
 				w.Header().Set("Location", "/")
 				w.WriteHeader(http.StatusTemporaryRedirect)
