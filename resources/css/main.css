@@ -23,12 +23,24 @@ content {
   text-decoration: none
 }
 
+.fa-amazon:hover {
+    color: rgb(255, 153, 0)
+}
+
 .fa-facebook:hover {
     color: rgb(66, 103, 178)
 }
 
 .fa-google:hover {
     color: rgb(66, 133, 244)
+}
+
+.fa-microsoft:hover {
+    color: rgb(0, 120, 212)
+}
+
+.fa-twitter:hover {
+    color: rgb(29, 161, 242)
 }
 
 /* header */

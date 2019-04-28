@@ -29,7 +29,7 @@ type ProviderIndex struct {
 	Map  map[string]string
 }
 
-var providers = &ProviderIndex{Keys: []string{"amazon", "facebook", "google", "instagram", "microsoft", "twitter"}, Map: make(map[string]string)}
+var providers = &ProviderIndex{Keys: []string{"amazon", "facebook", "google", "microsoft", "twitter"}, Map: make(map[string]string)}
 
 var providerKey = &contextKey{"Provider"}
 
@@ -88,6 +88,7 @@ func registerProvider(name string) {
 		p = instagram.New(client, secret, callback)
 	case "microsoft":
 		p = microsoft.New(client, secret, callback)
+		p.SetName("microsoft")
 	case "twitter":
 		p = twitter.New(client, secret, callback)
 	case "yahoo":
