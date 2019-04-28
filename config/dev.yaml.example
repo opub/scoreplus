@@ -1,0 +1,47 @@
+salt: "CHANGE_ME"
+
+db:
+  name: scoreplus_dev
+  host: localhost
+  port: 5432
+  username: scoreplus_user
+  password: "CHANGE_ME"
+
+log:
+  level: debug
+  console: true
+  caller: true
+
+path:
+  staticfiles: "resources/"
+  templates: "web/templates/"
+
+auth:
+  sessionsecret: "CHANGE_ME"
+  callback: "http://localhost:8080/auth/%s/callback"
+  secure: false
+
+  # https://developer.amazon.com/loginwithamazon/console/site/lwa/overview.html
+  amazon:
+    key: "GET_FROM_URL_ABOVE"
+    secret: "GET_FROM_URL_ABOVE"
+
+  # https://developers.facebook.com/apps/
+  facebook:
+    key: "GET_FROM_URL_ABOVE"
+    secret: "GET_FROM_URL_ABOVE"
+
+  # https://console.developers.google.com/apis/credentials
+  google:
+    key: "GET_FROM_URL_ABOVE"
+    secret: "GET_FROM_URL_ABOVE"
+
+  # https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredAppsPreview
+  microsoft:
+    key: "GET_FROM_URL_ABOVE"
+    secret: "GET_FROM_URL_ABOVE"
+
+  # https://developer.twitter.com/en/apps
+  twitter:
+    key: "GET_FROM_URL_ABOVE"
+    secret: "GET_FROM_URL_ABOVE"
