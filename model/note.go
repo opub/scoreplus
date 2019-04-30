@@ -9,10 +9,10 @@ type Note struct {
 //Save persists object to data store
 func (n *Note) Save() error {
 	if n.ID == 0 {
-		n.Created = nullTimeNow()
+		n.Created = NullTimeNow()
 		return n.execSQL("INSERT INTO note (message, created, createdby) VALUES (:message, :created, :createdby) RETURNING id", n)
 	}
-	n.Modified = nullTimeNow()
+	n.Modified = NullTimeNow()
 	return n.execSQL("UPDATE note SET message=:message, modified=:modified, modifiedby=:modifiedby WHERE id=:id", n)
 }
 

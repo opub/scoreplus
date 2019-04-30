@@ -91,7 +91,7 @@ func TestGameSelect(t *testing.T) {
 }
 
 func testGame() Game {
-	g := Game{HomeScore: 101, AwayScore: 99, Final: true, Start: nullTimeNow()}
+	g := Game{HomeScore: 101, AwayScore: 99, Final: true, Start: NullTimeNow()}
 	g.Save()
 	return g
 }

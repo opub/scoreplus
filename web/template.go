@@ -8,7 +8,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var baseTemplates = []string{"home"}
+var baseTemplates = []string{"home", "login"}
+var memberTemplates = []string{"profile"}
 var staticTemplates = []string{"privacy"}
 
 //Templates that have been loaded into the system
@@ -17,6 +18,9 @@ var Templates = make(map[string]*template.Template)
 func init() {
 	for _, n := range baseTemplates {
 		Templates[n] = parseTemplate(n)
+	}
+	for _, n := range memberTemplates {
+		Templates[n] = parseTemplate("member/" + n)
 	}
 	for _, n := range staticTemplates {
 		Templates[n] = parseTemplate("static/" + n)

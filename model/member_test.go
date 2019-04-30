@@ -8,9 +8,8 @@ import (
 
 func TestMemberCRUD(t *testing.T) {
 	//create
-	handle := random()
-	email := handle + "@score.plus"
-	m1 := Member{Handle: handle, Email: email, FirstName: "John", LastName: "Doe"}
+	email := "tester@score.plus"
+	m1 := Member{Email: email, FirstName: "John", LastName: "Doe"}
 	err := m1.Save()
 	if err != nil {
 		t.Errorf("insert failed: %v", err)
@@ -18,7 +17,10 @@ func TestMemberCRUD(t *testing.T) {
 	if m1.ID == 0 {
 		t.Errorf("id not set after insert")
 	}
-	if m1.Handle != handle || m1.Email != email || m1.FirstName != "John" || m1.LastName != "Doe" {
+	if m1.Handle == "" {
+		t.Errorf("handle not set after insert")
+	}
+	if m1.Email != email || m1.FirstName != "John" || m1.LastName != "Doe" {
 		t.Errorf("data not persisted on insert")
 	}
 

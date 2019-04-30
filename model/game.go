@@ -24,10 +24,10 @@ type Game struct {
 func (g *Game) Save() error {
 	g.setup()
 	if g.ID == 0 {
-		g.Created = nullTimeNow()
+		g.Created = NullTimeNow()
 		return g.execSQL("INSERT INTO game (sport, hometeam, awayteam, homescore, awayscore, start, final, venue, notes, created, createdby) VALUES (:sport, :hometeam, :awayteam, :homescore, :awayscore, :start, :final, :venue, :notes, :created, :createdby) RETURNING id", g)
 	}
-	g.Modified = nullTimeNow()
+	g.Modified = NullTimeNow()
 	return g.execSQL("UPDATE game SET sport=:sport, hometeam=:hometeam, awayteam=:awayteam, homescore=:homescore, awayscore=:awayscore, start=:start, final=:final, venue=:venue, notes=:notes, modified=:modified, modifiedby=:modifiedby WHERE id=:id", g)
 }
 

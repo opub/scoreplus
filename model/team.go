@@ -19,10 +19,10 @@ type Team struct {
 func (t *Team) Save() error {
 	t.setup()
 	if t.ID == 0 {
-		t.Created = nullTimeNow()
+		t.Created = NullTimeNow()
 		return t.execSQL("INSERT INTO team (name, sport, venue, mascot, games, created, createdby) VALUES (:name, :sport, :venue, :mascot, :games, :created, :createdby) RETURNING id", t)
 	}
-	t.Modified = nullTimeNow()
+	t.Modified = NullTimeNow()
 	return t.execSQL("UPDATE team SET name=:name, sport=:sport, venue=:venue, mascot=:mascot, games=:games, modified=:modified, modifiedby=:modifiedby WHERE id=:id", t)
 }
 

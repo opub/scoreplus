@@ -9,10 +9,10 @@ type Sport struct {
 //Save persists object to data store
 func (s *Sport) Save() error {
 	if s.ID == 0 {
-		s.Created = nullTimeNow()
+		s.Created = NullTimeNow()
 		return s.execSQL("INSERT INTO sport (name, created, createdby) VALUES (:name, :created, :createdby) RETURNING id", s)
 	}
-	s.Modified = nullTimeNow()
+	s.Modified = NullTimeNow()
 	return s.execSQL("UPDATE sport SET name=:name, modified=:modified, modifiedby=:modifiedby WHERE id=:id", s)
 }
 

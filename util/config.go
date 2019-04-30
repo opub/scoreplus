@@ -12,18 +12,19 @@ import (
 
 //Config application settings
 type Config struct {
-	Salt string
-	DB   Database
-	Log  Log
-	Path Path
-	Auth Auth
+	Salt    string
+	DB      Database
+	Log     Log
+	Path    Path
+	Session Session
 }
 
-//Auth config settings
-type Auth struct {
-	SessionSecret string
-	Callback      string
-	Secure        bool
+//Session config settings
+type Session struct {
+	Secret string
+	Hash   string
+	Block  string
+	Secure bool
 }
 
 //Path config settings

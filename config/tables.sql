@@ -39,7 +39,8 @@ CREATE TABLE member
 	, email email NOT NULL UNIQUE
 	, firstname text
 	, lastname text
-	, verified boolean
+	, provider text
+	, providerid text
 	, enabled boolean
 	, lastactive timestamp with time zone
 	, teams integer[] DEFAULT '{}'

@@ -49,11 +49,14 @@ func get(id int64, model interface{}) error {
 	}
 
 	table := strings.ToLower(reflect.TypeOf(model).Elem().Name())
-	sql := fmt.Sprintf("SELECT * FROM %s WHERE id=%d LIMIT 1", table, id)
+	sql := fmt.Sprintf("SELECT * FROM %s WHERE id=$1 LIMIT 1", table)
 
 	log.Info().Str("table", table).Int64("id", id).Msg("model.get")
 
-	rows, err := db.Queryx(sql)
+	rows, err := db.Queryx(sql, id)
+	if err != nil {
+		return err
+	}
 	defer rows.Close()
 
 	if rows.Next() {
@@ -118,6 +121,12 @@ func (b Base) Value() (driver.Value, error) {
 	return b.ID, nil
 }
 
-func nullTimeNow() null.Time {
-	return null.Time{Time: time.Now().Truncate(time.Microsecond), Valid: true}
+//NullTimeNow returns time.Now() as a nullable database value
+func NullTimeNow() null.Time {
+	return WrapTime(time.Now())
+}
+
+//WrapTime wraps a time.Time value as a null.Time for database usage
+func WrapTime(t time.Time) null.Time {
+	return null.Time{Time: t.Truncate(time.Microsecond), Valid: true}
 }
