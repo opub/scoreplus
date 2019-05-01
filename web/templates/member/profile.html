@@ -2,12 +2,28 @@
 
 <h2>Member Profile</h2>
 
-ID={{.ID}}
-<br>
-Email={{.Email}}
-<br>
-Handle={{.Handle}}
-<br>
-Enabled={{.Enabled}}
+{{ if .Message }}
+    {{ if .Success }}
+    <div class="success">{{.Message}}</div>
+    {{ else }}
+    <div class="failure">{{.Message}}</div>
+    {{ end }}
+{{end }}
+<br />
+
+<form method="POST">
+    <label>Handle:</label><br />
+    <input type="text" name="handle" value="{{.Data.Handle}}" required="true" minlength="5"><br /><br />
+    <label>First Name:</label><br />
+    <input type="text" name="firstname" value="{{.Data.FirstName}}"><br /><br />
+    <label>Last Name:</label><br />
+    <input type="text" name="lastname" value="{{.Data.LastName}}"><br /><br />
+    <label>Email:</label><br />
+    {{.Data.Email}}<br /><br />
+    <label>Provider:</label><br />
+    {{.Data.Provider}}<br />
+    <br />
+    <input type="submit">
+</form>
 
 {{ end }}
