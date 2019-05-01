@@ -140,7 +140,7 @@ func findUser(u goth.User, w http.ResponseWriter, r *http.Request) {
 	setMemberSession(m, w, r)
 
 	//redirect user
-	if existing {
+	if m.Enabled {
 		w.Header().Set("Location", "/")
 	} else {
 		w.Header().Set("Location", "/member/profile")

@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/rs/zerolog/log"
 	"github.com/speps/go-hashids"
 )
 
@@ -14,8 +15,8 @@ var (
 	baseTime int64 = 1554500000
 )
 
-const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 const (
+	letterBytes   = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 	letterIdxBits = 6                    // 6 bits to represent a letter index
 	letterIdxMask = 1<<letterIdxBits - 1 // All 1-bits, as many as letterIdxBits
 	letterIdxMax  = 63 / letterIdxBits   // # of letter indices fitting in 63 bits
@@ -43,30 +44,48 @@ func RandomString(length int) string {
 	return string(b)
 }
 
-//RandomID produces a new random ID
-func RandomID() (string, error) {
-	onceHash.Do(func() {
-		config := GetConfig()
+//EncodeID encodes an ID and date as a string
+func EncodeID(id int64, date time.Time) string {
+	onceHash.Do(initHashIDs)
 
-		//initialize hashids data
-		data := hashids.NewData()
-		data.Salt = config.Salt
-		data.Alphabet = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789" //remove ambiguous chars
-		data.MinLength = 10
-		hi, _ = hashids.NewWithData(data)
+	parts := []int64{rand.Int63n(100000), id, date.Unix()}
 
-		//make rand nondeterministic
-		rand.Seed(time.Now().UnixNano())
-	})
+	log.Debug().Ints64("parts", parts).Msg("encoding parts")
 
-	//our id is based on current epoch nanoseconds and a pseudo-random 63-bit int for uniqueness
-	now := int(time.Now().Unix() - baseTime)
-	rnd := rand.Intn(10000)
-
-	id, err := hi.Encode([]int{now, rnd})
+	x, err := hi.EncodeInt64(parts)
 	if err != nil {
-		return "", err
+		log.Error().Ints64("parts", parts).Msg("failed to encode id")
+	}
+	return x
+}
+
+//DecodeID decodes an ID and date from a string
+func DecodeID(hash string) (int64, time.Time) {
+	onceHash.Do(initHashIDs)
+
+	x, err := hi.DecodeInt64WithError(hash)
+	if err != nil || len(x) != 3 {
+		log.Error().Str("hash", hash).Msg("failed to decode id")
+		return 0, time.Now().AddDate(-1, 0, 0)
 	}
 
-	return id, nil
+	log.Debug().Ints64("parts", x).Msg("decoded parts")
+
+	id := x[1]
+	date := time.Unix(x[2], 0)
+	return id, date
+}
+
+func initHashIDs() {
+	config := GetConfig()
+
+	//initialize hashids data
+	data := hashids.NewData()
+	data.Salt = config.Salt
+	data.Alphabet = letterBytes
+	data.MinLength = 24
+	hi, _ = hashids.NewWithData(data)
+
+	//make rand nondeterministic
+	rand.Seed(time.Now().UnixNano())
 }

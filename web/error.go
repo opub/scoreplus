@@ -45,6 +45,9 @@ func ErrServerError(err error) render.Renderer {
 	}
 }
 
+//ErrUnauthorized renderer for 401
+var ErrUnauthorized = &StatusResponse{HTTPStatusCode: 1, StatusText: "Not Authorized"}
+
 //ErrNotFound renderer for 404
 var ErrNotFound = &StatusResponse{HTTPStatusCode: 404, StatusText: "Not Found"}
 
