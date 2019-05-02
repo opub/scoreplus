@@ -18,7 +18,7 @@ var buildCmd = &cobra.Command{
 	},
 }
 
-var models = []interface{}{model.Game{}, model.Member{}, model.Note{}, model.Sport{}, model.Team{}, model.Venue{}}
+var models = []interface{}{model.Game{}, model.Member{}, model.Note{}, model.Team{}, model.Venue{}}
 
 // generate SQL script to build database tables for the models listed above
 func buildSchemaSQL() {
@@ -75,8 +75,12 @@ func buildColumnSQL(f reflect.StructField, first bool) {
 	case "Int64Array":
 		ctype = "integer[] DEFAULT '{}'"
 	default:
-		//cheating because nested structs have ints as FK
-		ctype = "integer NOT NULL DEFAULT 0"
+		if f.Type.String() == "model.Sport" {
+			ctype = "text"
+		} else {
+			//cheating because nested structs have ints as FK
+			ctype = "integer NOT NULL DEFAULT 0"
+		}
 	}
 
 	if !first {

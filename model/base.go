@@ -15,6 +15,12 @@ import (
 	"github.com/opub/scoreplus/db"
 )
 
+//Sport name
+type Sport string
+
+//Sports supported sports
+var Sports = []Sport{"Baseball", "Basketball", "Cricket", "Field Hockey", "Football", "Ice Hockey", "Kickball", "Lacrosse", "Pickle Ball", "Rugby", "Soccer", "Softball", "Table Tennis", "Tennis", "Ultimate Frisbee", "Volleyball", "Water Polo"}
+
 //Model data store operations
 type Model interface {
 	Save() error

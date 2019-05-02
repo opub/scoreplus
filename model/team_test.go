@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/opub/scoreplus/util"
 )
 
 func TestTeamCRUD(t *testing.T) {
@@ -82,7 +83,7 @@ func TestTeamSelect(t *testing.T) {
 }
 
 func testTeam() Team {
-	t := Team{Name: random(), Mascot: random()}
+	t := Team{Name: util.RandomString(10), Mascot: util.RandomString(10)}
 	t.Save()
 	return t
 }

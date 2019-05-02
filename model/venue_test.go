@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/opub/scoreplus/util"
 )
 
 func TestVenueCRUD(t *testing.T) {
@@ -84,7 +85,7 @@ func TestVenueSelect(t *testing.T) {
 }
 
 func testVenue() Venue {
-	v := Venue{Name: random(), Address: random(), Coordinates: random()}
+	v := Venue{Name: util.RandomString(10), Address: util.RandomString(10), Coordinates: util.RandomString(10)}
 	v.Save()
 	return v
 }

@@ -8,7 +8,7 @@ CREATE TABLE game
 	, createdby integer NOT NULL DEFAULT 0
 	, modified timestamp with time zone
 	, modifiedby integer NOT NULL DEFAULT 0
-	, sport integer NOT NULL DEFAULT 0
+	, sport text
 	, hometeam integer NOT NULL DEFAULT 0
 	, awayteam integer NOT NULL DEFAULT 0
 	, homescore integer
@@ -73,25 +73,6 @@ ALTER TABLE note OWNER TO scoreplus_owner;
 GRANT SELECT, USAGE ON SEQUENCE note_id_seq TO scoreplus_writer;
 GRANT SELECT ON SEQUENCE note_id_seq TO scoreplus_reader;
 
--- sport
-
-DROP TABLE IF EXISTS sport CASCADE;
-CREATE TABLE sport
-(
-	id serial PRIMARY KEY
-	, created timestamp with time zone NOT NULL DEFAULT now()
-	, createdby integer NOT NULL DEFAULT 0
-	, modified timestamp with time zone
-	, modifiedby integer NOT NULL DEFAULT 0
-	, name text
-)
-WITH (
-	OIDS = FALSE
-);
-ALTER TABLE sport OWNER TO scoreplus_owner;
-GRANT SELECT, USAGE ON SEQUENCE sport_id_seq TO scoreplus_writer;
-GRANT SELECT ON SEQUENCE sport_id_seq TO scoreplus_reader;
-
 -- team
 
 DROP TABLE IF EXISTS team CASCADE;
@@ -103,7 +84,7 @@ CREATE TABLE team
 	, modified timestamp with time zone
 	, modifiedby integer NOT NULL DEFAULT 0
 	, name text
-	, sport integer NOT NULL DEFAULT 0
+	, sport text
 	, venue integer NOT NULL DEFAULT 0
 	, mascot text
 	, games integer[] DEFAULT '{}'

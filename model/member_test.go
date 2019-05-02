@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/opub/scoreplus/util"
 )
 
 func TestMemberCRUD(t *testing.T) {
@@ -58,11 +59,11 @@ func TestMemberCRUD(t *testing.T) {
 }
 
 func TestMemberSelect(t *testing.T) {
-	m1 := testMember()
+	m1 := testMember(t)
 	defer m1.Delete()
-	m2 := testMember()
+	m2 := testMember(t)
 	defer m2.Delete()
-	m3 := testMember()
+	m3 := testMember(t)
 	defer m3.Delete()
 	expected := []Member{m1, m2, m3}
 
@@ -85,9 +86,12 @@ func TestMemberSelect(t *testing.T) {
 	}
 }
 
-func testMember() Member {
-	handle := random()
-	m := Member{Handle: handle, Email: handle + "@score.plus", FirstName: handle, LastName: handle}
-	m.Save()
+func testMember(t *testing.T) Member {
+	handle := util.RandomString(10)
+	m := Member{Handle: handle, Email: handle + "@score.plus", FirstName: handle, LastName: handle, Provider: "test", ProviderID: handle}
+	err := m.Save()
+	if err != nil {
+		t.Fatalf("test member save failed: %v", err)
+	}
 	return m
 }

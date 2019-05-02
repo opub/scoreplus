@@ -8,15 +8,13 @@ import (
 )
 
 func TestGameCRUD(t *testing.T) {
-	s := testSimpleSport()
-	defer s.Delete()
 	t1 := testSimpleTeam()
 	defer t1.Delete()
 	t2 := testSimpleTeam()
 	defer t2.Delete()
 
 	//create
-	m1 := Game{Sport: s, HomeTeam: t1, AwayTeam: t2, HomeScore: 10, AwayScore: 1}
+	m1 := Game{Sport: Sports[0], HomeTeam: t1, AwayTeam: t2, HomeScore: 10, AwayScore: 1}
 	err := m1.Save()
 	if err != nil {
 		t.Errorf("insert failed: %v", err)
@@ -94,14 +92,6 @@ func testGame() Game {
 	g := Game{HomeScore: 101, AwayScore: 99, Final: true, Start: NullTimeNow()}
 	g.Save()
 	return g
-}
-
-func testSimpleSport() Sport {
-	s := testSport()
-	s.Name = ""
-	s.Created = null.Time{}
-	s.CreatedBy = 0
-	return s
 }
 
 func testSimpleTeam() Team {

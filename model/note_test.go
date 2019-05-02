@@ -4,11 +4,12 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/opub/scoreplus/util"
 )
 
 func TestNoteCRUD(t *testing.T) {
 	//create
-	message := random()
+	message := util.RandomString(10)
 	m1 := Note{Message: message}
 	err := m1.Save()
 	if err != nil {
@@ -32,7 +33,7 @@ func TestNoteCRUD(t *testing.T) {
 	}
 
 	//update
-	message = random()
+	message = util.RandomString(10)
 	m1.Message = message
 	err = m1.Save()
 	if err != nil {
@@ -84,7 +85,7 @@ func TestNoteSelect(t *testing.T) {
 }
 
 func testNote() Note {
-	n := Note{Message: random()}
+	n := Note{Message: util.RandomString(10)}
 	n.Save()
 	return n
 }
