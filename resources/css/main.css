@@ -3,6 +3,7 @@
 body {
   margin: 0;
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size: 16px;
   background-color: #f4f4f4;
 }
 
@@ -18,9 +19,31 @@ a {
     color: #900;
 }
 
+.layout {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+header {
+    flex-shrink: 0;
+}
+
 content {
-  margin: 10px 20px 10px 20px;
-  display: inline-block
+    margin: 10px 20px 10px 20px;
+    display: inline-block;
+    flex: 1 0 auto;
+}
+
+footer {
+    flex-shrink: 0;
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 15px;
+}
+
+footer>a {
+    text-decoration: none;
 }
 
 /* login */

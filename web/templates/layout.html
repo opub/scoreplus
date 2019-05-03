@@ -9,15 +9,16 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
 </head>
 <body>
+    <div class="layout">
     <header class="header">
         <a href="/" class="logo">Score+</a>
         <input class="menu-btn" type="checkbox" id="menu-btn" />
         <label class="menu-icon" for="menu-btn"><span class="navicon"></span></label>
         <ul class="menu">
-            <li><a href="#work">Our Work</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#careers">Careers</a></li>
-            <li><a href="/privacy">Privacy</a></li>
+            <li><a href="/team">Teams</a></li>
+            <li><a href="/member">Members</a></li>
+            <li></li>
+            <li></li>
             <li><a href="/login">Login</a></li>
         </ul>
     </header>
@@ -25,6 +26,8 @@
         {{ template "content" . }}
     </content>
     <footer>
+        <a href="/about">About Us</a> | <a href="/privacy">Privacy</a>
     </footer>
+    </div>
 </body>
 </html>
