@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/opub/scoreplus/model"
@@ -26,10 +27,33 @@ func routeMembers(r *chi.Mux) {
 	r.Route("/member", func(r chi.Router) {
 		r.Use(SessionCtx)
 
+		//list
+		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+			templateHandler("member/list", ActionResult{}, w, r)
+		})
+
+		r.Post("/", func(w http.ResponseWriter, r *http.Request) {
+			r.ParseForm()
+
+			a := ActionResult{Message: "Search successful!", Success: true}
+
+			search := r.Form.Get("search")
+			results, err := model.SearchMembers(search)
+			if err != nil {
+				log.Warn().Err(err).Msg("member search failed")
+				a.Message = fmt.Sprintf("Search failed: %s", err.Error())
+				a.Success = false
+			} else {
+				a.Data = results
+			}
+
+			templateHandler("member/list", a, w, r)
+		})
+
 		//profile
 		r.Get("/profile", func(w http.ResponseWriter, r *http.Request) {
 			m := r.Context().Value(sessionKey).(*model.Member)
-			templateHandler("profile", ActionResult{Data: m}, w, r)
+			templateHandler("member/profile", ActionResult{Data: m}, w, r)
 		})
 
 		r.Post("/profile", func(w http.ResponseWriter, r *http.Request) {
@@ -55,7 +79,19 @@ func routeMembers(r *chi.Mux) {
 				a.Success = false
 			}
 
-			templateHandler("profile", a, w, r)
+			templateHandler("member/profile", a, w, r)
+		})
+
+		r.Get("/{id}", func(w http.ResponseWriter, r *http.Request) {
+			s := chi.URLParam(r, "id")
+			id, err := strconv.ParseInt(s, 10, 64)
+			if err != nil {
+				log.Info().Str("id", s).Msg("invalid id")
+				render.Render(w, r, ErrBadRequest(err))
+				return
+			}
+			m, err := model.GetMember(id)
+			templateHandler("member/details", ActionResult{Data: m}, w, r)
 		})
 	})
 }

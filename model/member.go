@@ -46,6 +46,32 @@ func (m *Member) Delete() error {
 	return m.delete("member")
 }
 
+func SearchMembers(search string) ([]Member, error) {
+	db, err := db.Connect()
+	if err != nil {
+		return nil, err
+	}
+
+	term := strings.ToLower(strings.TrimSpace(search))
+	sql := "SELECT * FROM member WHERE lower(handle) LIKE '%' || $1 || '%' OR lower(firstname) LIKE '%' || $1 || '%' OR lower(lastname) LIKE '%' || $1 || '%'"
+	rows, err := db.Queryx(sql, term)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	results := make([]Member, 0)
+	for rows.Next() {
+		m := Member{}
+		err = rows.StructScan(&m)
+		if err != nil {
+			return nil, err
+		}
+		results = append(results, m)
+	}
+	return results, nil
+}
+
 //SelectMembers from data store where ID in slice
 func SelectMembers(ids []int64) ([]Member, error) {
 	rows, err := selectRows(ids, "member")

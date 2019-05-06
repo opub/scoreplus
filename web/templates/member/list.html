@@ -1,0 +1,23 @@
+{{ define "content" }}
+
+<h2>Members</h2>
+
+Search for existing members. You can join us simply by <a href="/login">logging in</a>
+
+<br><br>
+
+<form method="POST">
+    <label>Member:</label><br />
+    <input type="text" name="search" required="true" minlength="2"><br /><br />
+ 
+    <input type="submit" value="Search">
+</form>
+
+{{ if .Success }}
+<h3>Results</h3>
+{{ range $m := .Data }}
+    <a href="/member/{{ $m.ID }}/">{{ $m.Handle }} ({{ $m.FirstName }} {{ $m.LastName }})</a> <br>
+{{ end }}
+{{ end }}
+
+{{ end }}

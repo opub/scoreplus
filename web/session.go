@@ -28,7 +28,7 @@ func setMemberSession(m model.Member, w http.ResponseWriter, r *http.Request) {
 
 	value := map[string]string{
 		"key": util.RandomString(24),
-		"sig": util.EncodeID(m.ID, expires),
+		"sig": util.EncodeCookie(m.ID, expires),
 	}
 	encoded, err := sc.Encode(sessionCookie, value)
 	if err != nil {
@@ -62,7 +62,7 @@ func getSessionMember(w http.ResponseWriter, r *http.Request) (model.Member, err
 	}
 
 	//verify expiration beyond cookie that can be faked
-	id, expires := util.DecodeID(value["sig"])
+	id, expires := util.DecodeCookie(value["sig"])
 	if expires.Before(time.Now()) {
 		return m, errors.New("session has expired")
 	}

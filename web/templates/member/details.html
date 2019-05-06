@@ -1,0 +1,21 @@
+{{ define "content" }}
+
+<h2>Member Details</h2>
+
+{{ if .Message }}
+    {{ if .Success }}
+    <div class="success">{{.Message}}</div>
+    {{ else }}
+    <div class="failure">{{.Message}}</div>
+    {{ end }}
+{{end }}
+<br />
+
+<label>Handle:</label><br />
+{{.Data.Handle}}<br /><br />
+<label>First Name:</label><br />
+{{.Data.FirstName}}<br /><br />
+<label>Last Name:</label><br />
+{{.Data.LastName}}<br /><br />
+
+{{ end }}

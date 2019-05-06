@@ -42,10 +42,10 @@ func Start() {
 		templateHandler("home", providers, w, r)
 	})
 	r.Get("/home", func(w http.ResponseWriter, r *http.Request) {
-		templateHandler("home", providers, w, r)
+		templateHandler("static/home", providers, w, r)
 	})
 	r.Get("/privacy", func(w http.ResponseWriter, r *http.Request) {
-		templateHandler("privacy", "", w, r)
+		templateHandler("static/privacy", "", w, r)
 	})
 
 	// r.Route("/game", func(r chi.Router) {
@@ -82,15 +82,17 @@ func Start() {
 }
 
 func templateHandler(name string, data interface{}, w http.ResponseWriter, r *http.Request) {
-	log.Debug().Str("template", name).Msg("starting handler")
-	t := Templates[name]
-	err := t.Execute(w, data)
-	if err != nil {
-		log.Error().Str("template", name).Msg("could not execute template")
-		render.Render(w, r, ErrServerError(err))
-		return
+	log.Debug().Str("template", name).Msg("template handler")
+	if t, ok := Templates[name]; ok {
+		err := t.Execute(w, data)
+		if err != nil {
+			log.Error().Str("template", name).Msg("could not execute template")
+			render.Render(w, r, ErrServerError(err))
+			return
+		}
+	} else {
+		log.Error().Str("template", name).Msg("template doesn't exist")
 	}
-	log.Debug().Str("template", name).Msg("completed handler")
 }
 
 // fileServer sets up a http.FileServer handler to serve

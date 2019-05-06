@@ -44,8 +44,8 @@ func RandomString(length int) string {
 	return string(b)
 }
 
-//EncodeID encodes an ID and date as a string
-func EncodeID(id int64, date time.Time) string {
+//EncodeCookie encodes an ID and date as a string
+func EncodeCookie(id int64, date time.Time) string {
 	onceHash.Do(initHashIDs)
 
 	parts := []int64{rand.Int63n(100000), id, date.Unix()}
@@ -59,8 +59,8 @@ func EncodeID(id int64, date time.Time) string {
 	return x
 }
 
-//DecodeID decodes an ID and date from a string
-func DecodeID(hash string) (int64, time.Time) {
+//DecodeCookie decodes an ID and date from a string
+func DecodeCookie(hash string) (int64, time.Time) {
 	onceHash.Do(initHashIDs)
 
 	x, err := hi.DecodeInt64WithError(hash)

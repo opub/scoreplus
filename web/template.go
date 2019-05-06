@@ -9,7 +9,7 @@ import (
 )
 
 var baseTemplates = []string{"home", "login"}
-var memberTemplates = []string{"profile"}
+var memberTemplates = []string{"list", "details", "profile"}
 var staticTemplates = []string{"privacy"}
 
 //Templates that have been loaded into the system
@@ -20,10 +20,10 @@ func init() {
 		Templates[n] = parseTemplate(n)
 	}
 	for _, n := range memberTemplates {
-		Templates[n] = parseTemplate("member/" + n)
+		Templates["member/"+n] = parseTemplate("member/" + n)
 	}
 	for _, n := range staticTemplates {
-		Templates[n] = parseTemplate("static/" + n)
+		Templates["static/"+n] = parseTemplate("static/" + n)
 	}
 }
 
