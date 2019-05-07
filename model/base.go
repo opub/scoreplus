@@ -13,6 +13,7 @@ import (
 
 	"github.com/guregu/null"
 	"github.com/opub/scoreplus/db"
+	"github.com/opub/scoreplus/util"
 )
 
 //Sport name
@@ -57,7 +58,7 @@ func get(id int64, model interface{}) error {
 	table := strings.ToLower(reflect.TypeOf(model).Elem().Name())
 	sql := fmt.Sprintf("SELECT * FROM %s WHERE id=$1 LIMIT 1", table)
 
-	log.Info().Str("table", table).Int64("id", id).Msg("model.get")
+	log.Debug().Str("table", table).Int64("id", id).Msg("model.get")
 
 	rows, err := db.Queryx(sql, id)
 	if err != nil {
@@ -125,6 +126,11 @@ func (b *Base) Scan(value interface{}) error {
 //Value implements the driver Valuer interface
 func (b Base) Value() (driver.Value, error) {
 	return b.ID, nil
+}
+
+//LinkID gets ID as a linkable string
+func (b Base) LinkID() string {
+	return util.EncodeLink(b.ID)
 }
 
 //NullTimeNow returns time.Now() as a nullable database value

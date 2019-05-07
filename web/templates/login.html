@@ -5,7 +5,7 @@ You don't have to remember yet another username and password. Simply select your
 <br><br>
 
 {{range $key,$value:=.Keys}}
-    <a href="/auth/{{$value}}/login" class="fab fa-{{$value}} login" title="Log in with {{index $.Map $value}}"></a>
+    <a href="/auth/{{$value}}/login" class="fab fa-{{$value}} icon" title="Log in with {{index $.Map $value}}"></a>
 {{end}}
 
 {{ end }}

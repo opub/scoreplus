@@ -10,12 +10,14 @@ import (
 )
 
 var (
-	hi       *hashids.HashID
+	hic      *hashids.HashID
+	hil      *hashids.HashID
 	onceHash sync.Once
 	baseTime int64 = 1554500000
 )
 
 const (
+	linkChars     = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789" //removed ambiguous chars
 	letterBytes   = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 	letterIdxBits = 6                    // 6 bits to represent a letter index
 	letterIdxMask = 1<<letterIdxBits - 1 // All 1-bits, as many as letterIdxBits
@@ -47,14 +49,10 @@ func RandomString(length int) string {
 //EncodeCookie encodes an ID and date as a string
 func EncodeCookie(id int64, date time.Time) string {
 	onceHash.Do(initHashIDs)
-
 	parts := []int64{rand.Int63n(100000), id, date.Unix()}
-
-	log.Debug().Ints64("parts", parts).Msg("encoding parts")
-
-	x, err := hi.EncodeInt64(parts)
+	x, err := hic.EncodeInt64(parts)
 	if err != nil {
-		log.Error().Ints64("parts", parts).Msg("failed to encode id")
+		log.Error().Ints64("parts", parts).Msg("failed to encode cookie")
 	}
 	return x
 }
@@ -62,29 +60,54 @@ func EncodeCookie(id int64, date time.Time) string {
 //DecodeCookie decodes an ID and date from a string
 func DecodeCookie(hash string) (int64, time.Time) {
 	onceHash.Do(initHashIDs)
-
-	x, err := hi.DecodeInt64WithError(hash)
+	x, err := hic.DecodeInt64WithError(hash)
 	if err != nil || len(x) != 3 {
-		log.Error().Str("hash", hash).Msg("failed to decode id")
+		log.Error().Str("hash", hash).Msg("failed to decode cookie")
 		return 0, time.Now().AddDate(-1, 0, 0)
 	}
-
-	log.Debug().Ints64("parts", x).Msg("decoded parts")
 
 	id := x[1]
 	date := time.Unix(x[2], 0)
 	return id, date
 }
 
+//EncodeLink encodes an ID as a string
+func EncodeLink(id int64) string {
+	onceHash.Do(initHashIDs)
+	x, err := hil.EncodeInt64([]int64{id})
+	if err != nil {
+		log.Error().Int64("id", id).Msg("failed to encode link")
+	}
+	return x
+}
+
+//DecodeLink decodes an ID from a string
+func DecodeLink(hash string) int64 {
+	onceHash.Do(initHashIDs)
+	x, err := hil.DecodeInt64WithError(hash)
+	if err != nil || len(x) != 1 {
+		log.Error().Str("hash", hash).Msg("failed to decode link")
+		return 0
+	}
+	return x[0]
+}
+
 func initHashIDs() {
 	config := GetConfig()
 
-	//initialize hashids data
+	//initialize hashids data for cookies
 	data := hashids.NewData()
 	data.Salt = config.Salt
 	data.Alphabet = letterBytes
 	data.MinLength = 24
-	hi, _ = hashids.NewWithData(data)
+	hic, _ = hashids.NewWithData(data)
+
+	//initialize hashids data for links
+	data = hashids.NewData()
+	data.Salt = config.Salt
+	data.Alphabet = linkChars
+	data.MinLength = 5
+	hil, _ = hashids.NewWithData(data)
 
 	//make rand nondeterministic
 	rand.Seed(time.Now().UnixNano())

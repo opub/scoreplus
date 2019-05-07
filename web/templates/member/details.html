@@ -8,14 +8,26 @@
     {{ else }}
     <div class="failure">{{.Message}}</div>
     {{ end }}
-{{end }}
-<br />
+{{ end }}
+<br>
 
-<label>Handle:</label><br />
-{{.Data.Handle}}<br /><br />
-<label>First Name:</label><br />
-{{.Data.FirstName}}<br /><br />
-<label>Last Name:</label><br />
-{{.Data.LastName}}<br /><br />
+<label>Handle:</label><br>
+{{.Data.Handle}}<br><br>
+<label>First Name:</label><br>
+{{.Data.FirstName}}<br><br>
+<label>Last Name:</label><br>
+{{.Data.LastName}}<br><br>
+
+{{ if .Session }}
+    {{ if .Follows }}
+<form method="POST" action="/member/{{.Data.LinkID}}/unfollow">
+    <button type="submit" class="fas fa-star icon unfollow" title="Unfollow {{.Data.Handle}}"></button>
+</form>
+    {{ else }}
+<form method="POST" action="/member/{{.Data.LinkID}}/follow">
+    <button type="submit" class="far fa-star icon follow" title="Follow {{.Data.Handle}}"></button>
+</form>
+    {{ end }}
+{{ end }}
 
 {{ end }}

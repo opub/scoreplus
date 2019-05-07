@@ -13,7 +13,7 @@ Proin vel egestas quam. Morbi at mollis nunc, vitae eleifend mauris. Ut in egest
 <br><br>
 
 {{range $key,$value:=.Keys}}
-    <a href="/auth/{{$value}}/login" class="fab fa-{{$value}} login" title="Log in with {{index $.Map $value}}"></a>
+    <a href="/auth/{{$value}}/login" class="fab fa-{{$value}} icon" title="Log in with {{index $.Map $value}}"></a>
 {{end}}
 
 {{ end }}

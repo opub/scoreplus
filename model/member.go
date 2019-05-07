@@ -46,6 +46,17 @@ func (m *Member) Delete() error {
 	return m.delete("member")
 }
 
+//HasFollower shows if id is a follower of Member
+func (m *Member) HasFollower(id int64) bool {
+	return util.Contains(m.Followers, id)
+}
+
+//DoesFollow shows if Member follows id
+func (m *Member) DoesFollow(id int64) bool {
+	return util.Contains(m.Follows, id)
+}
+
+//SearchMembers finds members that match a search string
 func SearchMembers(search string) ([]Member, error) {
 	db, err := db.Connect()
 	if err != nil {
