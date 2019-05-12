@@ -13,7 +13,6 @@ import (
 
 	"github.com/guregu/null"
 	"github.com/opub/scoreplus/db"
-	"github.com/opub/scoreplus/util"
 )
 
 //Sport name
@@ -26,6 +25,7 @@ var Sports = []Sport{"Baseball", "Basketball", "Cricket", "Field Hockey", "Footb
 type Model interface {
 	Save() error
 	Delete() error
+	LinkID() string
 }
 
 //Base model that provides common fields
@@ -126,11 +126,6 @@ func (b *Base) Scan(value interface{}) error {
 //Value implements the driver Valuer interface
 func (b Base) Value() (driver.Value, error) {
 	return b.ID, nil
-}
-
-//LinkID gets ID as a linkable string
-func (b Base) LinkID() string {
-	return util.EncodeLink(b.ID)
 }
 
 //NullTimeNow returns time.Now() as a nullable database value

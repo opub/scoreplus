@@ -1,5 +1,7 @@
 package model
 
+import "github.com/opub/scoreplus/util"
+
 //Venue data model
 type Venue struct {
 	Base
@@ -21,6 +23,11 @@ func (v *Venue) Save() error {
 //Delete removes object from data store
 func (v *Venue) Delete() error {
 	return v.delete("venue")
+}
+
+//LinkID gets ID as a linkable string
+func (v Venue) LinkID() string {
+	return util.EncodeLink(v.ID, 50)
 }
 
 //SelectVenues from data store where ID in slice

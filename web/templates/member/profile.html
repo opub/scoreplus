@@ -13,7 +13,7 @@
 
 <form method="POST">
     <label>Handle:</label><br>
-    <input type="text" name="handle" value="{{.Data.Handle}}" required="true" minlength="5"><br><br>
+    <input type="text" name="handle" value="{{.Data.Handle}}" required="true" minlength="5" pattern="[a-zA-Z0-9_]{5,}"><br><br>
     <label>First Name:</label><br>
     <input type="text" name="firstname" value="{{.Data.FirstName}}"><br><br>
     <label>Last Name:</label><br>

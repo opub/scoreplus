@@ -1,0 +1,33 @@
+{{ define "content" }}
+
+<h2>Teams</h2>
+
+Search for existing teams.
+
+<br><br>
+
+<!-- TODO populate form after post -->
+
+<form method="POST">
+    <label>Team:</label><br>
+    <input type="text" name="search" required="true" minlength="2"><br><br>
+    <label>Sport:</label><br>
+    <select name="sport" required="true">
+        {{ range $s := .Sports }}
+        <option value="{{ $s }}">{{ $s }}</option>
+        {{ end }}        
+    </select>
+    <br><br>
+    <input type="submit" value="Search">
+</form>
+
+{{ if .Success }}
+<h3>Results</h3>
+{{ range $m := .Data }}
+    <a href="/team/{{ $m.LinkID }}/">{{ $m.Name }} ({{ $m.FirstName }} {{ $m.LastName }})</a> <br>
+{{ end }}
+<br>
+If you can't find your team then you can <a href="/team/new/">create a new one</a>.
+{{ end }}
+
+{{ end }}

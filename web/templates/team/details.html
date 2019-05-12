@@ -1,0 +1,15 @@
+{{ define "content" }}
+
+<h2>Team Details</h2>
+
+<label>Sport:</label><br>
+{{.Data.Sport}}<br><br>
+<label>Name:</label><br>
+{{.Data.Name}}<br><br>
+<label>Mascot:</label><br>
+{{.Data.Mascot}}<br><br>
+<label>Venue:</label><br>
+<!-- TODO better handle missing venue name -->
+<a href="/venue/{{.Data.Venue.LinkID}}/">{{.Data.Venue.Name}}</a><br><br>
+
+{{ end }}

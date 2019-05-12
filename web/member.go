@@ -16,8 +16,8 @@ import (
 
 var sessionKey = &contextKey{"Session"}
 
-//ActionResult has message to return about action that just happened
-type ActionResult struct {
+//MemberData has data required for template params
+type MemberData struct {
 	Message string
 	Success bool
 	Session bool
@@ -31,13 +31,13 @@ func routeMembers(r *chi.Mux) {
 
 		//list
 		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-			templateHandler("member/list", ActionResult{}, w, r)
+			templateHandler("member/list", MemberData{}, w, r)
 		})
 
 		r.Post("/", func(w http.ResponseWriter, r *http.Request) {
 			r.ParseForm()
 
-			a := ActionResult{Message: "Search successful!", Success: true}
+			a := MemberData{Message: "Search successful!", Success: true}
 
 			search := r.Form.Get("search")
 			results, err := model.SearchMembers(search)
@@ -55,12 +55,12 @@ func routeMembers(r *chi.Mux) {
 		//profile
 		r.Get("/profile", func(w http.ResponseWriter, r *http.Request) {
 			m := r.Context().Value(sessionKey).(*model.Member)
-			templateHandler("member/profile", ActionResult{Data: m}, w, r)
+			templateHandler("member/profile", MemberData{Data: m}, w, r)
 		})
 
 		r.Post("/profile", func(w http.ResponseWriter, r *http.Request) {
 			m := r.Context().Value(sessionKey).(*model.Member)
-			a := ActionResult{Message: "Update successful!", Success: true, Data: m}
+			a := MemberData{Message: "Update successful!", Success: true, Data: m}
 
 			if m.ID > 0 {
 				r.ParseForm()
@@ -90,7 +90,7 @@ func routeMembers(r *chi.Mux) {
 			s := chi.URLParam(r, "id")
 			id := util.DecodeLink(s)
 			me := r.Context().Value(sessionKey).(*model.Member)
-			a := ActionResult{Follows: me.DoesFollow(id), Session: (me.ID != 0 && me.ID != id)}
+			a := MemberData{Follows: me.DoesFollow(id), Session: (me.ID != 0 && me.ID != id)}
 			m, err := model.GetMember(id)
 			if err != nil {
 				log.Warn().Str("id", s).Msg("member not found")

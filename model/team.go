@@ -1,7 +1,11 @@
 package model
 
 import (
+	"strings"
+
 	"github.com/lib/pq"
+	"github.com/opub/scoreplus/db"
+	"github.com/opub/scoreplus/util"
 )
 
 //Team data model
@@ -31,6 +35,11 @@ func (t *Team) Delete() error {
 	return t.delete("team")
 }
 
+//LinkID gets ID as a linkable string
+func (t Team) LinkID() string {
+	return util.EncodeLink(t.ID, 40)
+}
+
 //SelectTeams from data store where ID in slice
 func SelectTeams(ids []int64) ([]Team, error) {
 	rows, err := selectRows(ids, "team")
@@ -52,6 +61,33 @@ func SelectTeams(ids []int64) ([]Team, error) {
 	return results, nil
 }
 
+//SearchTeams finds teams that match a search string and sport
+func SearchTeams(search string, sport string) ([]Team, error) {
+	db, err := db.Connect()
+	if err != nil {
+		return nil, err
+	}
+
+	term := strings.ToLower(strings.TrimSpace(search))
+	sql := "SELECT * FROM team WHERE lower(name) LIKE '%' || $1 || '%' AND sport = $2"
+	rows, err := db.Queryx(sql, term, sport)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	results := make([]Team, 0)
+	for rows.Next() {
+		t := Team{}
+		err = rows.StructScan(&t)
+		if err != nil {
+			return nil, err
+		}
+		results = append(results, t)
+	}
+	return results, nil
+}
+
 //SelectAllTeams from data store
 func SelectAllTeams() ([]Team, error) {
 	return SelectTeams(nil)
@@ -62,6 +98,15 @@ func GetTeam(id int64) (Team, error) {
 	t := Team{}
 	err := get(id, &t)
 	t.setup()
+	return t, err
+}
+
+//GetTeamFull returns team from data store with nested structs populated
+func GetTeamFull(id int64) (Team, error) {
+	t, err := GetTeam(id)
+	if t.Venue.ID != 0 && err == nil {
+		t.Venue, err = GetVenue(t.Venue.ID)
+	}
 	return t, err
 }
 

@@ -3,6 +3,7 @@ package model
 import (
 	"github.com/guregu/null"
 	"github.com/lib/pq"
+	"github.com/opub/scoreplus/util"
 )
 
 //Game data model
@@ -34,6 +35,11 @@ func (g *Game) Save() error {
 //Delete removes object from data store
 func (g *Game) Delete() error {
 	return g.delete("game")
+}
+
+//LinkID gets ID as a linkable string
+func (g Game) LinkID() string {
+	return util.EncodeLink(g.ID, 10)
 }
 
 //SelectGames from data store where ID in slice

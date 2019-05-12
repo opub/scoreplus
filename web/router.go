@@ -66,6 +66,7 @@ func Start() {
 	//additional routing
 	routeAuth(r)
 	routeMembers(r)
+	routeTeams(r)
 
 	//static resources
 	config := util.GetConfig()

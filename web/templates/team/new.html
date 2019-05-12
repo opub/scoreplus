@@ -1,0 +1,23 @@
+{{ define "content" }}
+
+<h2>Create Team</h2>
+
+<form method="POST">
+    <label>Sport:</label><br>
+    <select name="sport" required="true">
+        {{ range $s := .Sports }}
+        <option value="{{ $s }}">{{ $s }}</option>
+        {{ end }}        
+    </select><br><br>
+    <label>Name:</label><br>
+    <input type="text" name="teamname" required="true" minlength="2"><br><br>
+    <label>Mascot:</label><br>
+    <input type="text" name="mascot"><br><br>
+    <label>Venue:</label><br>
+    <!-- TODO better handle venue name -->
+    <input type="text" name="venue"><br><br>
+    <br>
+    <input type="submit" value="Save">
+</form>
+
+{{ end }}

@@ -46,6 +46,11 @@ func (m *Member) Delete() error {
 	return m.delete("member")
 }
 
+//LinkID gets ID as a linkable string
+func (m Member) LinkID() string {
+	return util.EncodeLink(m.ID, 20)
+}
+
 //HasFollower shows if id is a follower of Member
 func (m *Member) HasFollower(id int64) bool {
 	return util.Contains(m.Followers, id)

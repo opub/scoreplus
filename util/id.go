@@ -72,11 +72,11 @@ func DecodeCookie(hash string) (int64, time.Time) {
 }
 
 //EncodeLink encodes an ID as a string
-func EncodeLink(id int64) string {
+func EncodeLink(id int64, t int) string {
 	onceHash.Do(initHashIDs)
-	x, err := hil.EncodeInt64([]int64{id})
+	x, err := hil.EncodeInt64([]int64{id, int64(t)})
 	if err != nil {
-		log.Error().Int64("id", id).Msg("failed to encode link")
+		log.Error().Int64("id", id).Int("type", t).Msg("failed to encode link")
 	}
 	return x
 }
@@ -85,7 +85,7 @@ func EncodeLink(id int64) string {
 func DecodeLink(hash string) int64 {
 	onceHash.Do(initHashIDs)
 	x, err := hil.DecodeInt64WithError(hash)
-	if err != nil || len(x) != 1 {
+	if err != nil || len(x) != 2 {
 		log.Error().Str("hash", hash).Msg("failed to decode link")
 		return 0
 	}

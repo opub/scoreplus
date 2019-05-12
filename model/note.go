@@ -1,5 +1,7 @@
 package model
 
+import "github.com/opub/scoreplus/util"
+
 //Note data model
 type Note struct {
 	Base
@@ -19,6 +21,11 @@ func (n *Note) Save() error {
 //Delete removes object from data store
 func (n *Note) Delete() error {
 	return n.delete("note")
+}
+
+//LinkID gets ID as a linkable string
+func (n Note) LinkID() string {
+	return util.EncodeLink(n.ID, 30)
 }
 
 //SelectNotes from data store where ID in slice
