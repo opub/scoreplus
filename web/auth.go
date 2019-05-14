@@ -56,7 +56,7 @@ func init() {
 func routeAuth(r *chi.Mux) {
 	//login starting point
 	r.Get("/login", func(w http.ResponseWriter, r *http.Request) {
-		templateHandler("login", providers, w, r)
+		templateHandler("login", "", true, providers, w, r)
 	})
 
 	r.Route("/auth", func(r chi.Router) {
@@ -65,6 +65,7 @@ func routeAuth(r *chi.Mux) {
 		r.Get("/logout", func(w http.ResponseWriter, r *http.Request) {
 			log.Debug().Msg("routing auth logout")
 			gothic.Logout(w, r)
+			deleteMemberSession(w)
 			w.Header().Set("Location", "/")
 			w.WriteHeader(http.StatusTemporaryRedirect)
 		})

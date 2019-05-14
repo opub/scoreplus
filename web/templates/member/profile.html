@@ -11,6 +11,7 @@
 {{end }}
 <br>
 
+{{ if .Session }}
 <form method="POST">
     <label>Handle:</label><br>
     <input type="text" name="handle" value="{{.Data.Handle}}" required="true" minlength="5" pattern="[a-zA-Z0-9_]{5,}"><br><br>
@@ -25,5 +26,6 @@
     <br>
     <input type="submit" value="Save">
 </form>
+{{ end }}
 
 {{ end }}

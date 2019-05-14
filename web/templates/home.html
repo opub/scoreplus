@@ -12,8 +12,10 @@ Maecenas nunc felis, sagittis quis rutrum sed, posuere quis dui. Aenean commodo 
 Proin vel egestas quam. Morbi at mollis nunc, vitae eleifend mauris. Ut in egestas quam, a dignissim elit. Donec auctor iaculis risus, in auctor felis mollis sit amet. Aliquam felis ipsum, consequat vel blandit vel, cursus a arcu. Nam pretium sem elit, at fermentum tortor suscipit a. Integer laoreet orci dapibus aliquam faucibus. In quis ultrices ex. Etiam convallis libero eget lacus hendrerit semper. Aliquam eget purus eu lacus lacinia convallis quis et ipsum. Proin sollicitudin dui nunc, id feugiat quam venenatis id. Phasellus tempus imperdiet auctor. Fusce aliquam sagittis orci quis imperdiet. Phasellus at massa sapien.
 <br><br>
 
-{{range $key,$value:=.Keys}}
-    <a href="/auth/{{$value}}/login" class="fab fa-{{$value}} icon" title="Log in with {{index $.Map $value}}"></a>
+{{ if not .Session }}
+{{range $key,$value := .Data.Keys}}
+    <a href="/auth/{{$value}}/login" class="fab fa-{{$value}} icon" title="Log in with {{index $.Data.Map $value}}"></a>
 {{end}}
+{{ end }}
 
 {{ end }}

@@ -13,7 +13,7 @@ Search for existing teams.
     <input type="text" name="search" required="true" minlength="2"><br><br>
     <label>Sport:</label><br>
     <select name="sport" required="true">
-        {{ range $s := .Sports }}
+        {{ range $s := .Data.Sports }}
         <option value="{{ $s }}">{{ $s }}</option>
         {{ end }}        
     </select>
@@ -23,11 +23,13 @@ Search for existing teams.
 
 {{ if .Success }}
 <h3>Results</h3>
-{{ range $m := .Data }}
-    <a href="/team/{{ $m.LinkID }}/">{{ $m.Name }} ({{ $m.FirstName }} {{ $m.LastName }})</a> <br>
+{{ range $m := .Data.Results }}
+    <a href="/team/{{ $m.LinkID }}/">{{ $m.Name }} {{ $m.Mascot }}</a> <br>
 {{ end }}
+{{ if .Session }}
 <br>
 If you can't find your team then you can <a href="/team/new/">create a new one</a>.
+{{ end }}
 {{ end }}
 
 {{ end }}

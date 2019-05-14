@@ -2,7 +2,10 @@
 
 <h2>Members</h2>
 
-Search for existing members. You can join us simply by <a href="/login">logging in</a>
+Search for existing members. 
+{{ if not .Session }}
+You can join us simply by <a href="/login">logging in</a>.
+{{ end }}
 
 <br><br>
 

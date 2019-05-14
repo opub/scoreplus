@@ -15,11 +15,8 @@ import (
 
 //TeamData has data required for template params
 type TeamData struct {
-	Message string
-	Success bool
-	Session bool
 	Sports  []model.Sport
-	Data    interface{}
+	Results interface{}
 }
 
 func routeTeams(r *chi.Mux) {
@@ -28,31 +25,26 @@ func routeTeams(r *chi.Mux) {
 
 		//list
 		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-			templateHandler("team/list", TeamData{Sports: model.Sports}, w, r)
+			templateHandler("team/list", "", false, TeamData{Sports: model.Sports}, w, r)
 		})
 
 		r.Post("/", func(w http.ResponseWriter, r *http.Request) {
 			r.ParseForm()
-
-			a := TeamData{Message: "Search successful!", Sports: model.Sports, Success: true}
-
+			message := ""
 			search := r.Form.Get("search")
 			sport := r.Form.Get("sport")
 			results, err := model.SearchTeams(search, sport)
 			if err != nil {
 				log.Error().Err(err).Msg("team search failed")
-				a.Message = fmt.Sprintf("Search failed: %s", err.Error())
-				a.Success = false
-			} else {
-				a.Data = results
+				message = fmt.Sprintf("Search failed: %s", err.Error())
 			}
 
-			templateHandler("team/list", a, w, r)
+			templateHandler("team/list", message, len(message) == 0, TeamData{Sports: model.Sports, Results: results}, w, r)
 		})
 
 		//new
 		r.Get("/new", func(w http.ResponseWriter, r *http.Request) {
-			templateHandler("team/new", TeamData{Sports: model.Sports}, w, r)
+			templateHandler("team/new", "", true, TeamData{Sports: model.Sports}, w, r)
 		})
 
 		r.Post("/new", func(w http.ResponseWriter, r *http.Request) {
@@ -76,15 +68,12 @@ func routeTeams(r *chi.Mux) {
 			t.Venue = venue
 			t.CreatedBy = m.ID
 
-			a := TeamData{Success: false}
-
 			err := t.Save()
 			if err != nil {
 				log.Error().Err(err).Msg("new team failed")
-				a.Message = fmt.Sprintf("Update failed: %s", err.Error())
-				a.Success = false
+				message := fmt.Sprintf("Update failed: %s", err.Error())
 
-				templateHandler("team/new", TeamData{Sports: model.Sports, Data: t}, w, r)
+				templateHandler("team/new", message, false, TeamData{Sports: model.Sports, Results: t}, w, r)
 			} else {
 				path := fmt.Sprintf("/team/%s", t.LinkID())
 				http.Redirect(w, r, path, http.StatusSeeOther)
@@ -95,7 +84,6 @@ func routeTeams(r *chi.Mux) {
 		r.Get("/{id}", func(w http.ResponseWriter, r *http.Request) {
 			s := chi.URLParam(r, "id")
 			id := util.DecodeLink(s)
-			a := TeamData{}
 			m, err := model.GetTeamFull(id)
 			if err != nil {
 				log.Warn().Str("id", s).Msg("team not found")
@@ -106,8 +94,7 @@ func routeTeams(r *chi.Mux) {
 				render.Render(w, r, ErrNotFound)
 				return
 			}
-			a.Data = m
-			templateHandler("team/details", a, w, r)
+			templateHandler("team/details", "", true, m, w, r)
 		})
 	})
 }

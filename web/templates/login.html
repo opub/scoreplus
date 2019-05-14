@@ -1,11 +1,14 @@
 {{ define "content" }}
 
+{{ if .Session }}
+<h2>You are already logged in!</h2>
+{{ else }}
 <h2>Login</h2>
 You don't have to remember yet another username and password. Simply select your preferred method of authentication below:
 <br><br>
-
-{{range $key,$value:=.Keys}}
-    <a href="/auth/{{$value}}/login" class="fab fa-{{$value}} icon" title="Log in with {{index $.Map $value}}"></a>
+{{range $key,$value := .Data.Keys}}
+    <a href="/auth/{{$value}}/login" class="fab fa-{{$value}} icon" title="Log in with {{index $.Data.Map $value}}"></a>
 {{end}}
+{{ end }}
 
 {{ end }}

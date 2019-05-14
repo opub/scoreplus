@@ -2,10 +2,11 @@
 
 <h2>Create Team</h2>
 
+{{ if .Session }}
 <form method="POST">
     <label>Sport:</label><br>
     <select name="sport" required="true">
-        {{ range $s := .Sports }}
+        {{ range $s := .Data.Sports }}
         <option value="{{ $s }}">{{ $s }}</option>
         {{ end }}        
     </select><br><br>
@@ -19,5 +20,6 @@
     <br>
     <input type="submit" value="Save">
 </form>
+{{ end }}
 
 {{ end }}

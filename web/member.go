@@ -18,11 +18,8 @@ var sessionKey = &contextKey{"Session"}
 
 //MemberData has data required for template params
 type MemberData struct {
-	Message string
-	Success bool
-	Session bool
 	Follows bool
-	Data    interface{}
+	Results interface{}
 }
 
 func routeMembers(r *chi.Mux) {
@@ -31,37 +28,32 @@ func routeMembers(r *chi.Mux) {
 
 		//list
 		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-			templateHandler("member/list", MemberData{}, w, r)
+			templateHandler("member/list", "", false, nil, w, r)
 		})
 
 		r.Post("/", func(w http.ResponseWriter, r *http.Request) {
 			r.ParseForm()
-
-			a := MemberData{Message: "Search successful!", Success: true}
-
+			message := ""
 			search := r.Form.Get("search")
 			results, err := model.SearchMembers(search)
 			if err != nil {
 				log.Error().Err(err).Msg("member search failed")
-				a.Message = fmt.Sprintf("Search failed: %s", err.Error())
-				a.Success = false
-			} else {
-				a.Data = results
+				message = fmt.Sprintf("Search failed: %s", err.Error())
 			}
 
-			templateHandler("member/list", a, w, r)
+			templateHandler("member/list", message, len(message) == 0, results, w, r)
 		})
 
 		//profile
 		r.Get("/profile", func(w http.ResponseWriter, r *http.Request) {
 			m := r.Context().Value(sessionKey).(*model.Member)
-			templateHandler("member/profile", MemberData{Data: m}, w, r)
+			templateHandler("member/profile", "", true, m, w, r)
 		})
 
 		r.Post("/profile", func(w http.ResponseWriter, r *http.Request) {
+			message := "Update Successful"
+			success := true
 			m := r.Context().Value(sessionKey).(*model.Member)
-			a := MemberData{Message: "Update successful!", Success: true, Data: m}
-
 			if m.ID > 0 {
 				r.ParseForm()
 
@@ -75,22 +67,21 @@ func routeMembers(r *chi.Mux) {
 				if err != nil {
 					log.Error().Err(err).Msg("profile update failed")
 					if strings.Contains(err.Error(), "member_handle_key") {
-						a.Message = fmt.Sprintf("Update failed: that handle is already taken")
+						message = fmt.Sprintf("Update Failed: that handle is already taken")
 					} else {
-						a.Message = fmt.Sprintf("Update failed: %s", err.Error())
+						message = fmt.Sprintf("Update Failed: %s", err.Error())
 					}
-					a.Success = false
+					success = false
 				}
 			}
 
-			templateHandler("member/profile", a, w, r)
+			templateHandler("member/profile", message, success, m, w, r)
 		})
 
 		r.Get("/{id}", func(w http.ResponseWriter, r *http.Request) {
 			s := chi.URLParam(r, "id")
 			id := util.DecodeLink(s)
 			me := r.Context().Value(sessionKey).(*model.Member)
-			a := MemberData{Follows: me.DoesFollow(id), Session: (me.ID != 0 && me.ID != id)}
 			m, err := model.GetMember(id)
 			if err != nil {
 				log.Warn().Str("id", s).Msg("member not found")
@@ -101,8 +92,7 @@ func routeMembers(r *chi.Mux) {
 				render.Render(w, r, ErrNotFound)
 				return
 			}
-			a.Data = m
-			templateHandler("member/details", a, w, r)
+			templateHandler("member/details", "", true, MemberData{Follows: me.DoesFollow(id), Results: m}, w, r)
 		})
 
 		r.Post("/{id}/follow", func(w http.ResponseWriter, r *http.Request) {
@@ -179,15 +169,10 @@ func routeMembers(r *chi.Mux) {
 	})
 }
 
-//SessionCtx adds requested Member to Context
+//SessionCtx adds requesting Member to Context
 func SessionCtx(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		m, err := getSessionMember(w, r)
-		if err != nil {
-			log.Warn().Err(err).Stack().Msg("session not loaded")
-			render.Render(w, r, ErrUnauthorized)
-			return
-		}
+		m := getSessionMember(w, r)
 		ctx := context.WithValue(r.Context(), sessionKey, &m)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
