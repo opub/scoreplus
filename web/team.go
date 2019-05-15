@@ -71,7 +71,7 @@ func routeTeams(r *chi.Mux) {
 			err := t.Save()
 			if err != nil {
 				log.Error().Err(err).Msg("new team failed")
-				message := fmt.Sprintf("Update failed: %s", err.Error())
+				message := fmt.Sprintf("Creation failed: %s", err.Error())
 
 				templateHandler("team/new", message, false, TeamData{Sports: model.Sports, Results: t}, w, r)
 			} else {

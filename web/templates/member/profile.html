@@ -2,15 +2,6 @@
 
 <h2>Member Profile</h2>
 
-{{ if .Message }}
-    {{ if .Success }}
-    <div class="success">{{.Message}}</div>
-    {{ else }}
-    <div class="failure">{{.Message}}</div>
-    {{ end }}
-{{end }}
-<br>
-
 {{ if .Session }}
 <form method="POST">
     <label>Handle:</label><br>

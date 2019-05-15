@@ -2,15 +2,6 @@
 
 <h2>Member Details</h2>
 
-{{ if .Message }}
-    {{ if .Success }}
-    <div class="success">{{.Message}}</div>
-    {{ else }}
-    <div class="failure">{{.Message}}</div>
-    {{ end }}
-{{ end }}
-<br>
-
 <label>Handle:</label><br>
 {{.Data.Results.Handle}}<br><br>
 <label>First Name:</label><br>

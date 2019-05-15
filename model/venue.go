@@ -1,6 +1,11 @@
 package model
 
-import "github.com/opub/scoreplus/util"
+import (
+	"strings"
+
+	"github.com/opub/scoreplus/db"
+	"github.com/opub/scoreplus/util"
+)
 
 //Venue data model
 type Venue struct {
@@ -60,4 +65,31 @@ func GetVenue(id int64) (Venue, error) {
 	v := Venue{}
 	err := get(id, &v)
 	return v, err
+}
+
+//SearchVenues finds venues that match a search string
+func SearchVenues(search string) ([]Venue, error) {
+	db, err := db.Connect()
+	if err != nil {
+		return nil, err
+	}
+
+	term := strings.ToLower(strings.TrimSpace(search))
+	sql := "SELECT * FROM venue WHERE lower(name) LIKE '%' || $1 || '%' OR lower(address) LIKE '%' || $1 || '%'"
+	rows, err := db.Queryx(sql, term)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	results := make([]Venue, 0)
+	for rows.Next() {
+		v := Venue{}
+		err = rows.StructScan(&v)
+		if err != nil {
+			return nil, err
+		}
+		results = append(results, v)
+	}
+	return results, nil
 }

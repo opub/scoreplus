@@ -1,0 +1,28 @@
+{{ define "content" }}
+
+<h2>Venues</h2>
+
+Search for existing venues.
+
+<br><br>
+
+<!-- TODO populate form after post -->
+
+<form method="POST">
+    <label>Venue:</label><br>
+    <input type="text" name="search" required="true" minlength="2"><br><br>
+    <input type="submit" value="Search">
+</form>
+
+{{ if .Success }}
+<h3>Results</h3>
+{{ range $m := .Data }}
+    <a href="/venue/{{ $m.LinkID }}/">{{ $m.Name }} ({{ $m.Address }})</a> <br>
+{{ end }}
+{{ if .Session }}
+<br>
+If you can't find your venue then you can <a href="/venue/new/">create a new one</a>.
+{{ end }}
+{{ end }}
+
+{{ end }}

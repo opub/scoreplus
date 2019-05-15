@@ -1,0 +1,21 @@
+{{ define "content" }}
+
+<h2>Create Venue</h2>
+
+{{ if .Session }}
+<form method="POST">
+    <label>Name:</label><br>
+    <input type="text" name="venuename" required="true" minlength="2"><br><br>
+    <label>Address:</label><br>
+    <input type="text" name="address" required="true" minlength="10"><br><br>
+{{- /* 
+    /* TODO handle coordinates */
+    <label>Coordinates:</label><br>
+    <input type="text" name="coordinates"><br><br>
+*/ -}}
+    <br>
+    <input type="submit" value="Save">
+</form>
+{{ end }}
+
+{{ end }}
