@@ -10,7 +10,6 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/go-chi/chi"
-	"github.com/go-chi/render"
 )
 
 func routeVenues(r *chi.Mux) {
@@ -70,11 +69,11 @@ func routeVenues(r *chi.Mux) {
 			m, err := model.GetVenue(id)
 			if err != nil {
 				log.Warn().Str("id", s).Msg("venue not found")
-				render.Render(w, r, ErrBadRequest(err))
+				renderBadRequest(err, w, r)
 				return
 			}
 			if m.ID == 0 {
-				render.Render(w, r, ErrNotFound)
+				renderNotFound(w, r)
 				return
 			}
 			templateHandler("venue/details", "", true, m, w, r)

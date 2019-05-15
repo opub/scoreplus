@@ -59,7 +59,7 @@ footer>a {
     color: #333;
 }
 .follow:hover, .unfollow {
-    color: rgba(255, 0, 242, 0.979)
+    color: rgba(255, 0, 0, 0.979)
 }
 
 /* login */

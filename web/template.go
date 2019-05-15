@@ -8,35 +8,30 @@ import (
 	"html/template"
 	"os"
 
-	"github.com/go-chi/render"
 	"github.com/opub/scoreplus/util"
 	"github.com/rs/zerolog/log"
 )
 
-var baseTemplates = []string{"home", "login"}
-var memberTemplates = []string{"list", "details", "profile"}
-var teamTemplates = []string{"list", "details", "new"}
-var venueTemplates = []string{"list", "details", "new"}
-var staticTemplates = []string{"privacy"}
+type templateGroup struct {
+	base  string
+	paths []string
+}
 
 //Templates that have been loaded into the system
 var Templates = make(map[string]*template.Template)
 
 func init() {
-	for _, n := range baseTemplates {
-		Templates[n] = parseTemplate(n)
-	}
-	for _, n := range memberTemplates {
-		Templates["member/"+n] = parseTemplate("member/" + n)
-	}
-	for _, n := range teamTemplates {
-		Templates["team/"+n] = parseTemplate("team/" + n)
-	}
-	for _, n := range venueTemplates {
-		Templates["venue/"+n] = parseTemplate("venue/" + n)
-	}
-	for _, n := range staticTemplates {
-		Templates["static/"+n] = parseTemplate("static/" + n)
+	groups := []templateGroup{{"", []string{"home", "login"}}, {"error", []string{"400", "404", "500"}}, {"member", []string{"list", "details", "profile"}},
+		{"team", []string{"list", "details", "new"}}, {"venue", []string{"list", "details", "new"}}, {"static", []string{"privacy"}}}
+
+	for _, g := range groups {
+		prefix := g.base + "/"
+		if len(g.base) == 0 {
+			prefix = ""
+		}
+		for _, p := range g.paths {
+			Templates[prefix+p] = parseTemplate(prefix + p)
+		}
 	}
 }
 
@@ -61,6 +56,21 @@ type TemplateData struct {
 	Data    interface{}
 }
 
+func renderBadRequest(e error, w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusBadRequest)
+	templateHandler("error/400", "", false, e, w, r)
+}
+
+func renderNotFound(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotFound)
+	templateHandler("error/404", "", false, nil, w, r)
+}
+
+func renderServerError(e error, w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusInternalServerError)
+	templateHandler("error/500", "", false, e, w, r)
+}
+
 func templateHandler(name string, message string, success bool, data interface{}, w http.ResponseWriter, r *http.Request) {
 	log.Debug().Str("template", name).Msg("template handler")
 	if t, ok := Templates[name]; ok {
@@ -69,8 +79,9 @@ func templateHandler(name string, message string, success bool, data interface{}
 		err := t.Execute(w, d)
 		if err != nil {
 			log.Error().Str("template", name).Msg("could not execute template")
-			render.Render(w, r, ErrServerError(err))
-			return
+			if name != "error/500" {
+				renderServerError(err, w, r)
+			}
 		}
 	} else {
 		log.Error().Str("template", name).Msg("template doesn't exist")

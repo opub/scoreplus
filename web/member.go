@@ -11,7 +11,6 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/go-chi/chi"
-	"github.com/go-chi/render"
 )
 
 var sessionKey = &contextKey{"Session"}
@@ -85,11 +84,11 @@ func routeMembers(r *chi.Mux) {
 			m, err := model.GetMember(id)
 			if err != nil {
 				log.Warn().Str("id", s).Msg("member not found")
-				render.Render(w, r, ErrBadRequest(err))
+				renderBadRequest(err, w, r)
 				return
 			}
 			if m.ID == 0 {
-				render.Render(w, r, ErrNotFound)
+				renderNotFound(w, r)
 				return
 			}
 			templateHandler("member/details", "", true, MemberData{Follows: me.DoesFollow(id), Results: m}, w, r)
@@ -102,11 +101,11 @@ func routeMembers(r *chi.Mux) {
 			m, err := model.GetMember(id)
 			if err != nil {
 				log.Warn().Str("id", s).Msg("member not found")
-				render.Render(w, r, ErrBadRequest(err))
+				renderBadRequest(err, w, r)
 				return
 			}
 			if m.ID == 0 {
-				render.Render(w, r, ErrNotFound)
+				renderNotFound(w, r)
 				return
 			}
 
@@ -115,14 +114,14 @@ func routeMembers(r *chi.Mux) {
 				err = me.Save()
 				if err != nil {
 					log.Error().Err(err).Int64("a", me.ID).Int64("b", m.ID).Msg("a couldn't follow b")
-					render.Render(w, r, ErrServerError(err))
+					renderServerError(err, w, r)
 					return
 				}
 				m.Followers = append(m.Followers, me.ID)
 				err = m.Save()
 				if err != nil {
 					log.Error().Err(err).Int64("b", m.ID).Int64("a", me.ID).Msg("b couldn't be followed by a")
-					render.Render(w, r, ErrServerError(err))
+					renderServerError(err, w, r)
 					return
 				}
 				log.Info().Int64("a", me.ID).Int64("b", m.ID).Msg("a followed b")
@@ -138,11 +137,11 @@ func routeMembers(r *chi.Mux) {
 			m, err := model.GetMember(id)
 			if err != nil {
 				log.Warn().Str("id", s).Msg("member not found")
-				render.Render(w, r, ErrBadRequest(err))
+				renderBadRequest(err, w, r)
 				return
 			}
 			if m.ID == 0 {
-				render.Render(w, r, ErrNotFound)
+				renderNotFound(w, r)
 				return
 			}
 
@@ -151,14 +150,14 @@ func routeMembers(r *chi.Mux) {
 				err = me.Save()
 				if err != nil {
 					log.Error().Err(err).Int64("a", me.ID).Int64("b", m.ID).Msg("a couldn't unfollow b")
-					render.Render(w, r, ErrServerError(err))
+					renderServerError(err, w, r)
 					return
 				}
 				m.Followers = util.Remove(m.Followers, me.ID)
 				err = m.Save()
 				if err != nil {
 					log.Error().Err(err).Int64("b", m.ID).Int64("a", me.ID).Msg("b couldn't be unfollowed by a")
-					render.Render(w, r, ErrServerError(err))
+					renderServerError(err, w, r)
 					return
 				}
 				log.Info().Int64("a", me.ID).Int64("b", m.ID).Msg("a unfollowed b")

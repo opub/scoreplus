@@ -10,7 +10,6 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/go-chi/chi"
-	"github.com/go-chi/render"
 )
 
 //TeamData has data required for template params
@@ -87,11 +86,11 @@ func routeTeams(r *chi.Mux) {
 			m, err := model.GetTeamFull(id)
 			if err != nil {
 				log.Warn().Str("id", s).Msg("team not found")
-				render.Render(w, r, ErrBadRequest(err))
+				renderBadRequest(err, w, r)
 				return
 			}
 			if m.ID == 0 {
-				render.Render(w, r, ErrNotFound)
+				renderNotFound(w, r)
 				return
 			}
 			templateHandler("team/details", "", true, m, w, r)

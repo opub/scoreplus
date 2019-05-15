@@ -9,7 +9,6 @@ import (
 	"github.com/opub/scoreplus/model"
 
 	"github.com/go-chi/chi"
-	"github.com/go-chi/render"
 	"github.com/gorilla/sessions"
 	"github.com/markbates/goth/gothic"
 	"github.com/opub/scoreplus/util"
@@ -90,7 +89,7 @@ func routeAuth(r *chi.Mux) {
 				user, err := gothic.CompleteUserAuth(w, r)
 				if err != nil {
 					log.Error().Err(err).Msg("user authentication failed")
-					render.Render(w, r, ErrServerError(err))
+					renderServerError(err, w, r)
 					return
 				}
 				findUser(user, w, r)
@@ -105,7 +104,7 @@ func findUser(u goth.User, w http.ResponseWriter, r *http.Request) {
 	m, err := model.GetMemberFromProvider(u.Provider, u.UserID)
 	if err != nil {
 		log.Error().Err(err).Msg("member lookup failed")
-		render.Render(w, r, ErrServerError(err))
+		renderServerError(err, w, r)
 		return
 	}
 
@@ -116,7 +115,7 @@ func findUser(u goth.User, w http.ResponseWriter, r *http.Request) {
 		err := m.Save()
 		if err != nil || m.ID == 0 {
 			log.Error().Err(err).Msg("member lastactive failed")
-			render.Render(w, r, ErrServerError(err))
+			renderServerError(err, w, r)
 			return
 		}
 	} else {
@@ -130,7 +129,7 @@ func findUser(u goth.User, w http.ResponseWriter, r *http.Request) {
 		err = m.Save()
 		if err != nil || m.ID == 0 {
 			log.Error().Err(err).Msg("initial member save failed")
-			render.Render(w, r, ErrServerError(err))
+			renderServerError(err, w, r)
 			return
 		}
 	}

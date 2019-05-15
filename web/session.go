@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/go-chi/render"
 	"github.com/gorilla/securecookie"
 	"github.com/opub/scoreplus/model"
 	"github.com/opub/scoreplus/util"
@@ -32,7 +31,7 @@ func setMemberSession(m model.Member, w http.ResponseWriter, r *http.Request) {
 	encoded, err := sc.Encode(sessionCookie, value)
 	if err != nil {
 		log.Error().Err(err).Msg("cookie encoding failed")
-		render.Render(w, r, ErrServerError(err))
+		renderServerError(err, w, r)
 		return
 	}
 

@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/middleware"
-	"github.com/go-chi/render"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
@@ -46,7 +45,7 @@ func Recoverer(next http.Handler) http.Handler {
 
 				log.Error().Stack().Err(errors.Wrap(err, "unexpected error")).Msg("unexpected error")
 				debug.PrintStack()
-				render.Render(w, r, ErrServerError(err))
+				renderServerError(err, w, r)
 			}
 		}()
 

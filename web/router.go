@@ -54,6 +54,8 @@ func Start() {
 	routeTeams(r)
 	routeVenues(r)
 
+	r.NotFound(renderNotFound)
+
 	//static resources
 	config := util.GetConfig()
 	wd, _ := os.Getwd()
